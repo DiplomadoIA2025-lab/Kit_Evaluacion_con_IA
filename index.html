@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kit de Evaluación con IA - Módulo Interactivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .slide {
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-primary {
+            background-image: linear-gradient(to right, #8e2de2, #4a00e0);
+        }
+        .btn-secondary {
+            background-image: linear-gradient(to right, #1d976c, #93f9b9);
+        }
+        .quiz-option {
+            transition: all 0.3s ease;
+        }
+        .quiz-option:hover:not(:disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .correct {
+            background-color: #28a745 !important;
+            color: white !important;
+            border-color: #28a745 !important;
+        }
+        .incorrect {
+            background-color: #dc3545 !important;
+            color: white !important;
+            border-color: #dc3545 !important;
+        }
+        .prompt-pro {
+            background: #1a1a2e;
+            border-left: 4px solid #16c79a;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <div class="container mx-auto">
+
+        <!-- Slide 1: Portada -->
+        <section id="slide1" class="slide flex flex-col items-center justify-center text-center p-8 min-h-screen">
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-900 via-purple-900 to-gray-900 opacity-80" style="z-index: -1;"></div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-blue-400 to-purple-500">Crea tu Kit de Evaluación con IA</h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8">Un módulo interactivo para educadores innovadores</p>
+            <div class="mb-8 w-full max-w-md">
+                <input type="text" id="studentNameInput" placeholder="Escribe tu nombre completo aquí" class="w-full px-4 py-3 bg-white bg-opacity-20 border-2 border-gray-400 rounded-full text-center text-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-green-300 transition-all">
+                <p id="name-error" class="text-red-400 text-sm mt-2 h-5"></p>
+            </div>
+            <a href="#" onclick="event.preventDefault(); startAdventure();" class="px-8 py-4 rounded-full text-lg font-bold text-white btn-primary transition-transform transform hover:scale-105">¡Comenzar la Aventura!</a>
+        </section>
+
+        <!-- Slide 2: El Poder de la Evaluación -->
+        <section id="slide2" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen">
+            <div class="w-full flex-grow flex flex-col items-center justify-center">
+                <h2 class="text-4xl font-bold mb-6 text-center">La Evaluación es más que una Nota</h2>
+                <p class="text-lg text-gray-400 mb-12 text-center max-w-3xl">No es solo la línea de meta. Es la <span class="text-yellow-400 font-semibold">brújula</span> que nos guía, el <span class="text-blue-400 font-semibold">retrovisor</span> que nos enseña del camino y el <span class="text-green-400 font-semibold">combustible</span> que impulsa el aprendizaje.</p>
+                <div class="grid md:grid-cols-3 gap-8 w-full max-w-5xl">
+                    <div class="glass-card p-6 rounded-2xl text-center">
+                        <div class="text-5xl mb-4">🧭</div>
+                        <h3 class="text-2xl font-bold mb-2">Brújula</h3>
+                        <p>Identifica conocimientos previos y orienta la enseñanza.</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl text-center">
+                        <div class="text-5xl mb-4">🔧</div>
+                        <h3 class="text-2xl font-bold mb-2">Retrovisor</h3>
+                        <p>Ofrece retroalimentación para mejorar y aprender del error.</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl text-center">
+                        <div class="text-5xl mb-4">🚀</div>
+                        <h3 class="text-2xl font-bold mb-2">Combustible</h3>
+                        <p>Certifica lo aprendido y motiva a seguir creciendo.</p>
+                    </div>
+                </div>
+            </div>
+             <a href="#" onclick="event.preventDefault(); showSlide(3);" class="px-8 py-3 rounded-full text-lg font-bold text-gray-900 btn-secondary transition-transform transform hover:scale-105">Entendido, ¡siguiente!</a>
+        </section>
+
+        <!-- Slide 3: Conceptos Clave para Prompts -->
+        <section id="slide3" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen">
+            <div class="w-full flex-grow flex flex-col items-center justify-center">
+                <h2 class="text-4xl font-bold mb-10 text-center">Ingredientes de un Prompt Poderoso</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl w-full">
+                    <div class="glass-card p-6 rounded-xl text-center cursor-pointer hover:bg-purple-700 transition-colors" onclick="showTip('Contexto', 'Define el nivel educativo, materia y características del grupo. La IA necesita saber para QUIÉN es la evaluación.')">
+                        <div class="text-4xl mb-3">🎓</div><h3 class="text-xl font-bold">Contexto</h3>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl text-center cursor-pointer hover:bg-purple-700 transition-colors" onclick="showTip('Tarea', 'Usa verbos de acción claros: genera, diseña, crea. Indica el TIPO de instrumento: test, rúbrica, encuesta.')">
+                        <div class="text-4xl mb-3">🎯</div><h3 class="text-xl font-bold">Tarea</h3>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl text-center cursor-pointer hover:bg-purple-700 transition-colors" onclick="showTip('Formato', 'Especifica CÓMO quieres la respuesta: ¿en una tabla?, ¿con viñetas?, ¿con justificación y retroalimentación?')">
+                        <div class="text-4xl mb-3">📄</div><h3 class="text-xl font-bold">Formato</h3>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl text-center cursor-pointer hover:bg-purple-700 transition-colors" onclick="showTip('Restricciones', 'Ponle límites a la IA: complejidad cognitiva (Bloom), longitud, tiempo estimado, exclusión de temas sensibles.')">
+                        <div class="text-4xl mb-3">🚧</div><h3 class="text-xl font-bold">Restricciones</h3>
+                    </div>
+                </div>
+                <p class="mt-8 text-gray-400">Haz clic en cada tarjeta para un Pro Tip.</p>
+            </div>
+            <a href="#" onclick="event.preventDefault(); showSlide(4);" class="px-8 py-3 rounded-full text-lg font-bold text-white btn-primary transition-transform transform hover:scale-105">¡A crear la primera evaluación!</a>
+        </section>
+
+        <!-- Modal para Tips -->
+        <div id="tipModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden z-50">
+            <div class="bg-gray-800 rounded-2xl p-8 max-w-lg w-full text-center border border-purple-500 shadow-lg">
+                <h3 id="tipTitle" class="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-blue-400"></h3>
+                <p id="tipText" class="text-lg text-gray-300 mb-6"></p>
+                <button class="px-6 py-2 rounded-full text-lg font-bold text-white btn-primary" onclick="closeModal()">¡Entendido!</button>
+            </div>
+        </div>
+
+        <!-- Parte 1: Evaluación Diagnóstica -->
+        <section id="slide4" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen bg-gradient-to-b from-gray-900 to-blue-900">
+            <div class="w-full flex-grow flex flex-col items-center justify-center">
+                <h2 class="text-xl font-bold text-blue-300 mb-2">PARTE 1: LA EVALUACIÓN DIAGNÓSTICA</h2>
+                <h3 class="text-4xl font-bold text-center mb-6">El Punto de Partida: ¿Qué saben mis estudiantes?</h3>
+                
+                <div class="glass-card rounded-2xl p-6 mb-6 w-full max-w-5xl">
+                    <h4 class="text-2xl font-bold mb-3 text-center">Conceptos Clave</h4>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm text-center">
+                        <div>
+                            <p class="font-bold text-blue-300">🎯 ¿Qué es?</p>
+                            <p class="text-gray-300">Es una foto inicial para entender desde dónde parten tus estudiantes: sus conocimientos previos, habilidades e interés por el tema. No es para calificar.</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-blue-300">💡 Tips de Uso</p>
+                            <p class="text-gray-300">Sé breve y enfocado. Usa formatos variados (imágenes, preguntas rápidas). Analiza los resultados para ajustar tu plan de clase, no para poner una nota.</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-blue-300">🤖 Superpoder con IA</p>
+                            <p class="text-gray-300">Pide a la IA que cree "mapas de conceptos erróneos" sobre un tema para que tus preguntas apunten a las confusiones más comunes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full max-w-5xl space-y-6">
+                    <div class="glass-card rounded-2xl p-8">
+                        <h4 class="text-2xl font-bold mb-4">Ejemplo Aplicado Completo</h4>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-left">
+                            <p><span class="text-purple-400">"Actúa como un docente de primaria experto.</span> Necesito crear una evaluación diagnóstica sobre <span class="text-yellow-400">'el ciclo del agua'</span> para estudiantes de <span class="text-yellow-400">9 años (grado 4)</span>. El objetivo es identificar sus conocimientos previos y posibles conceptos erróneos. La evaluación debe ser amigable y visual.
+                            <br><br>
+                            <span class="text-cyan-400">Genera lo siguiente:</span>
+                            <br>
+                            1. <span class="text-green-400">Tres preguntas de opción múltiple</span> con 4 opciones cada una. Indica la correcta y proporciona una <span class="text-pink-400">retroalimentación inmediata y sencilla</span> para CADA opción, explicando por qué es correcta o incorrecta.
+                            <br>
+                            2. <span class="text-green-400">Una pregunta abierta</span> que incentive la curiosidad: 'Si fueras una gotita de agua, ¿qué viaje te gustaría hacer? Describe una parada en tu aventura.'
+                            <br>
+                            <span class="text-orange-400">El tono debe ser motivador y el tiempo total no debe exceder los 15 minutos.</span>"</p>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8">
+                        <h4 class="text-2xl font-bold mb-4">🚀 Prompt PRO para Crear en HTML</h4>
+                         <p class="text-gray-300 mb-4">Copia y pega este prompt en Gemini para crear una mini-evaluación interactiva.</p>
+                         <div class="prompt-pro rounded-lg p-4 font-mono text-xs text-left">
+                            <p class="font-bold text-green-400 mb-2"># Prompt para un quiz diagnóstico interactivo:</p>
+                            <p>"Actúa como un desarrollador EdTech experto. Crea un archivo HTML único para una evaluación diagnóst-ica interactiva sobre <span class="text-yellow-400">'Las partes de una planta'</span> para niños de 8 años.
+                            <br><br>
+                            Debe incluir 2 preguntas de opción múltiple. Cada pregunta debe tener 3 opciones. Al hacer clic en una opción, el botón debe cambiar a color verde (si es correcta) o rojo (si es incorrecta) y mostrar una breve retroalimentación debajo. El diseño debe ser muy visual, con fuentes grandes, colores primarios vivos (azul, amarillo, verde) y esquinas redondeadas. Usa Tailwind CSS."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a href="#" onclick="event.preventDefault(); showSlide(5);" class="mt-8 px-8 py-3 rounded-full text-lg font-bold text-gray-900 btn-secondary transition-transform transform hover:scale-105">¡A comprobar tu conocimiento!</a>
+        </section>
+
+        <!-- Quiz 1: Diagnóstica -->
+        <section id="slide5" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen">
+             <div class="w-full flex-grow flex flex-col items-center justify-center">
+                <h2 class="text-3xl font-bold mb-8 text-center">Test Rápido: El Prompt Diagnóstico</h2>
+                <div id="quiz1-container" class="w-full max-w-3xl">
+                    <!-- Las preguntas se generan dinámicamente aquí -->
+                </div>
+                <div id="quiz1-result" class="mt-8 text-2xl font-bold text-center"></div>
+            </div>
+            <a href="#" id="next-link-1" class="hidden mt-8 px-8 py-3 rounded-full text-lg font-bold text-white btn-primary transition-transform transform hover:scale-105" onclick="event.preventDefault(); showSlide(6);">Continuar a la Evaluación Formativa</a>
+        </section>
+        
+        <!-- Parte 2: Evaluación Formativa -->
+        <section id="slide6" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen bg-gradient-to-b from-gray-900 to-green-900">
+             <div class="w-full flex-grow flex flex-col items-center justify-center">
+                <h2 class="text-xl font-bold text-green-300 mb-2">PARTE 2: LA EVALUACIÓN FORMATIVA</h2>
+                <h3 class="text-4xl font-bold text-center mb-6">El Proceso: ¿Vamos por buen camino?</h3>
+                
+                <div class="glass-card rounded-2xl p-6 mb-6 w-full max-w-5xl">
+                    <h4 class="text-2xl font-bold mb-3 text-center">Conceptos Clave</h4>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm text-center">
+                        <div>
+                            <p class="font-bold text-green-300">🎯 ¿Qué es?</p>
+                            <p class="text-gray-300">Es el GPS del aprendizaje. Se realiza *durante* el proceso para monitorear el progreso y ofrecer retroalimentación constante. Su objetivo es mejorar, no juzgar.</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-green-300">💡 Tips de Uso</p>
+                            <p class="text-gray-300">Debe ser frecuente, corta y de bajo riesgo (sin nota). La retroalimentación debe ser inmediata, clara y accionable. Fomenta la autoevaluación.</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-green-300">🤖 Superpoder con IA</p>
+                            <p class="text-gray-300">Pide a la IA que diseñe "tickets de salida" interactivos de 3 minutos, o que genere bancos de preguntas que se adapten a las respuestas del estudiante.</p>
+                        </div>
+                    </div>
+                </div>
+                 
+                 <div class="w-full max-w-5xl space-y-6">
+                    <div class="glass-card rounded-2xl p-8">
+                        <h4 class="text-2xl font-bold mb-4">Ejemplo Aplicado Completo</h4>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-left">
+                            <p><span class="text-purple-400">"Actúa como un coach de aprendizaje para adolescentes.</span> Crea una pauta de autoevaluación sobre la competencia <span class="text-yellow-400">'trabajo en equipo en un proyecto de ciencias'</span> para estudiantes de <span class="text-yellow-400">14 años</span>.
+                            <br><br>
+                            <span class="text-cyan-400">Estructura:</span>
+                            <br>
+                            1. <span class="text-green-400">Cinco afirmaciones en primera persona</span> para que el estudiante califique de 1 (casi nunca) a 5 (casi siempre).
+                            <br>
+                            2. <span class="text-green-400">Incluye aspectos de contribución</span> ('Aporto ideas al grupo') y <span class="text-green-400">aspectos socioemocionales</span> ('Escucho y respeto las opiniones de mis compañeros').
+                            <br>
+                            3. Al final, proporciona una <span class="text-pink-400">recomendación personalizada y accionable</span> basada en el puntaje total obtenido (ej: para puntajes bajos, medios y altos), enfocada en cómo mejorar."</p>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8">
+                        <h4 class="text-2xl font-bold mb-4">🚀 Prompt PRO para Crear en HTML</h4>
+                         <p class="text-gray-300 mb-4">Copia este prompt para generar una herramienta de autoevaluación interactiva.</p>
+                         <div class="prompt-pro rounded-lg p-4 font-mono text-xs text-left">
+                            <p class="font-bold text-green-400 mb-2"># Prompt para una autoevaluación interactiva:</p>
+                            <p>"Crea un archivo HTML único para una autoevaluación interactiva sobre <span class="text-yellow-400">'Mis hábitos de estudio'</span> para estudiantes de secundaria.
+                            <br><br>
+                            Incluye 3 afirmaciones. Cada una debe tener una escala de 1 a 5 (como botones seleccionables). Cuando el usuario presione un botón 'Ver mi recomendación' al final, debe aparecer un texto con un consejo personalizado simple basado en la puntuación promedio. Si el promedio es menor a 3, el consejo debe ser de mejora; si es mayor, de felicitación. Usa Tailwind CSS, un diseño limpio, colores verdes y azules, y texto claro y legible."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a href="#" onclick="event.preventDefault(); showSlide(7);" class="mt-8 px-8 py-3 rounded-full text-lg font-bold text-gray-900 btn-secondary transition-transform transform hover:scale-105">¡A comprobar este nuevo saber!</a>
+        </section>
+
+        <!-- Quiz 2: Formativa -->
+        <section id="slide7" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen">
+            <div class="w-full flex-grow flex flex-col items-center justify-center">
+                <h2 class="text-3xl font-bold mb-8 text-center">Test Rápido: El Prompt Formativo</h2>
+                <div id="quiz2-container" class="w-full max-w-3xl">
+                    <!-- Las preguntas se generan dinámicamente aquí -->
+                </div>
+                <div id="quiz2-result" class="mt-8 text-2xl font-bold text-center"></div>
+            </div>
+            <a href="#" id="next-link-2" class="hidden mt-8 px-8 py-3 rounded-full text-lg font-bold text-white btn-primary transition-transform transform hover:scale-105" onclick="event.preventDefault(); showSlide(8);">Continuar a la Evaluación Sumativa</a>
+        </section>
+
+        <!-- Parte 3: Evaluación Sumativa -->
+        <section id="slide8" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen bg-gradient-to-b from-gray-900 to-red-900">
+             <div class="w-full flex-grow flex flex-col items-center justify-center">
+                <h2 class="text-xl font-bold text-red-300 mb-2">PARTE 3: LA EVALUACIÓN SUMATIVA</h2>
+                <h3 class="text-4xl font-bold text-center mb-6">La Meta: ¿Qué hemos aprendido?</h3>
+                
+                <div class="glass-card rounded-2xl p-6 mb-6 w-full max-w-5xl">
+                    <h4 class="text-2xl font-bold mb-3 text-center">Conceptos Clave</h4>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm text-center">
+                        <div>
+                            <p class="font-bold text-red-300">🎯 ¿Qué es?</p>
+                            <p class="text-gray-300">Es la foto final del viaje. Busca certificar lo que el estudiante ha aprendido al final de una unidad. Generalmente, tiene una calificación formal.</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-red-300">💡 Tips de Uso</p>
+                            <p class="text-gray-300">Debe reflejar los objetivos de aprendizaje. Combina diferentes tipos de preguntas para evaluar distintas habilidades (memorizar vs. analizar). Usa rúbricas claras.</p>
+                        </div>
+                        <div>
+                            <p class="font-bold text-red-300">🤖 Superpoder con IA</p>
+                            <p class="text-gray-300">Pide a la IA que diseñe evaluaciones basadas en proyectos o casos realistas. Solicita múltiples versiones de un examen o que genere rúbricas muy detalladas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full max-w-5xl space-y-6">
+                    <div class="glass-card rounded-2xl p-8">
+                        <h4 class="text-2xl font-bold mb-4">Ejemplo Aplicado Completo</h4>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-left">
+                            <p><span class="text-purple-400">"Actúa como un evaluador experto para educación superior.</span> Necesito una evaluación sumativa sobre <span class="text-yellow-400">'Las causas de la Primera Guerra Mundial'</span> para estudiantes de <span class="text-yellow-400">16 años</span>.
+                            <br><br>
+                            <span class="text-cyan-400">Diseña una evaluación de 50 minutos que contenga:</span>
+                            <br>
+                            1. <span class="text-green-400">Sección de Conocimiento (40%):</span> Cuatro preguntas de opción múltiple con retroalimentación para cada opción.
+                            <br>
+                            2. <span class="text-green-400">Sección de Análisis de Fuentes (60%):</span> Presenta un breve texto de un historiador (simúlalo) y pide al estudiante que responda una pregunta abierta que requiera análisis crítico.
+                            <br><br>
+                            <span class="text-pink-400">Finalmente, genera una rúbrica detallada</span> para evaluar la pregunta abierta, con 3 niveles de desempeño (sobresaliente, suficiente, insuficiente) y criterios claros como 'Uso de evidencia', 'Argumentación' y 'Claridad'."</p>
+                        </div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-8">
+                        <h4 class="text-2xl font-bold mb-4">🚀 Prompt PRO 2.0 para Examen Interactivo</h4>
+                         <p class="text-gray-300 mb-4">El prompt anterior era bueno, ¡pero este es de otro nivel! Está diseñado para solucionar los problemas que mencionaste (evaluación de texto, puntuación, etc.) y crear una experiencia mucho más dinámica.</p>
+                         <div class="prompt-pro rounded-lg p-4 font-mono text-xs text-left">
+                            <p class="font-bold text-green-400 mb-2"># Prompt para un examen sumativo interactivo avanzado:</p>
+                            <p>"Eres un experto desarrollador Full-Stack y diseñador instruccional especializado en gamificación (EdTech). Genera un archivo HTML único para un examen final interactivo y visualmente impactante sobre 'El Sistema Solar', diseñado para estudiantes de 10 años.
+                            <br><br>
+                            <span class="text-yellow-400">Requisitos de Funcionalidad:</span>
+                            <br>
+                            1.  <span class="font-bold">Pantalla de Inicio Personalizada:</span> Antes de empezar, muestra una pantalla de bienvenida que pida al estudiante su nombre en un campo de texto y un botón para 'Empezar Examen'.
+                            <br>
+                            2.  <span class="font-bold">Preguntas Una por Una:</span> Las preguntas deben aparecer de una en una. Al responder, aparecerá un botón 'Siguiente'.
+                            <br>
+                            3.  <span class="font-bold">Retroalimentación Inmediata:</span> Para preguntas de opción múltiple, la opción seleccionada se ilumina (verde/correcta, rojo/incorrecta) y aparece un texto de feedback.
+                            <br>
+                            4.  <span class="font-bold">Evaluación de IA para Texto:</span> Incluye una pregunta de respuesta corta. Al evaluarla, simula una IA que busca palabras clave (ej: 'energía', 'luz', 'calor') y da feedback inmediato y acertado. ¡Asegúrate de que tu lógica de IA reconozca respuestas correctas como 'Proporciona energía'!
+                            <br>
+                            5.  <span class="font-bold">Puntuación Detallada:</span> Las dos primeras preguntas valen 15 puntos cada una. La tercera (texto) vale 20 puntos. El total es de 50 puntos.
+                            <br>
+                            6.  <span class="font-bold">Pantalla Final Personalizada y Motivadora:</span> Al terminar, muestra un mensaje como '¡Excelente trabajo, [Nombre del Estudiante]!', seguido del puntaje total (ej: '45/50 puntos') y un mensaje motivador que varíe según el desempeño.
+                            <br><br>
+                            <span class="text-yellow-400">Contenido de las Preguntas:</span>
+                            <br>
+                            -   P1 (Opción Múltiple): '¿Cuál es el planeta más grande del Sistema Solar?' (Júpiter es la correcta).
+                            <br>
+                            -   P2 (Opción Múltiple): '¿Qué planeta es conocido como el Planeta Rojo?' (Marte es la correcta).
+                            <br>
+                            -   P3 (Respuesta Corta): 'Describe con una frase corta la función principal del Sol.'
+                            <br><br>
+                            <span class="text-yellow-400">Requisitos de Diseño:</span>
+                            <br>
+                            Usa Tailwind CSS. El diseño debe ser muy gráfico, con un fondo oscuro de estrellas, colores vibrantes y neones para los elementos interactivos, fuentes grandes y claras (Poppins), y animaciones suaves para las transiciones."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a href="#" onclick="event.preventDefault(); showSlide(9);" class="mt-8 px-8 py-3 rounded-full text-lg font-bold text-gray-900 btn-secondary transition-transform transform hover:scale-105">¡Último desafío!</a>
+        </section>
+
+        <!-- Quiz 3: Sumativa -->
+        <section id="slide9" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen">
+            <div class="w-full flex-grow flex flex-col items-center justify-center">
+                <h2 class="text-3xl font-bold mb-8 text-center">Test Rápido: El Prompt Sumativo</h2>
+                <div id="quiz3-container" class="w-full max-w-3xl">
+                   <!-- Las preguntas se generan dinámicamente aquí -->
+                </div>
+                <div id="quiz3-result" class="mt-8 text-2xl font-bold text-center"></div>
+            </div>
+            <a href="#" id="next-link-3" class="hidden mt-8 px-8 py-3 rounded-full text-lg font-bold text-white btn-primary transition-transform transform hover:scale-105" onclick="event.preventDefault(); showSlide(10);">Ver mi informe final</a>
+        </section>
+
+        <!-- Parte 4: Reporte Final -->
+        <section id="slide10" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen bg-gradient-to-b from-gray-900 to-purple-900">
+             <div class="w-full flex-grow flex flex-col items-center justify-center">
+                <h2 id="final-greeting" class="text-4xl font-bold text-center mb-6">¡Felicidades, has completado tu entrenamiento!</h2>
+                <p class="text-lg text-gray-400 mb-10 text-center max-w-3xl">Has demostrado entender los fundamentos para crear evaluaciones de alto impacto con IA. La práctica constante te convertirá en un maestro.</p>
+                
+                <div class="w-full max-w-2xl">
+                    <div class="glass-card rounded-2xl p-8">
+                        <h3 id="report-title" class="text-3xl font-bold mb-6 text-center">Tu Informe Final de Aprendizaje</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-base font-medium text-blue-300">Dominio: Evaluación Diagnóstica</span>
+                                    <span id="score-label-1" class="text-sm font-medium text-blue-300">0%</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-4">
+                                    <div id="score-bar-1" class="bg-blue-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-base font-medium text-green-300">Dominio: Evaluación Formativa</span>
+                                    <span id="score-label-2" class="text-sm font-medium text-green-300">0%</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-4">
+                                    <div id="score-bar-2" class="bg-green-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-base font-medium text-red-300">Dominio: Evaluación Sumativa</span>
+                                    <span id="score-label-3" class="text-sm font-medium text-red-300">0%</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-4">
+                                    <div id="score-bar-3" class="bg-red-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-8 text-center text-gray-300">Recuerda: la mejor forma de aprender es <span class="font-bold text-yellow-300">creando</span>. ¡Usa los Prompts PRO y empieza a construir tus propias evaluaciones interactivas!</p>
+                    </div>
+                </div>
+            </div>
+             <a href="#" onclick="event.preventDefault(); resetAndStart();" class="mt-8 px-8 py-3 rounded-full text-lg font-bold text-gray-900 btn-secondary transition-transform transform hover:scale-105">Volver al inicio y practicar de nuevo</a>
+        </section>
+
+    </div>
+
+    <script>
+        // Modal Logic
+        const modal = document.getElementById('tipModal');
+        const modalTitle = document.getElementById('tipTitle');
+        const modalText = document.getElementById('tipText');
+
+        function showTip(title, text) {
+            modalTitle.innerText = title;
+            modalText.innerText = text;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+        }
+
+        let studentName = '';
+
+        function startAdventure() {
+            const nameInput = document.getElementById('studentNameInput');
+            const nameError = document.getElementById('name-error');
+            studentName = nameInput.value.trim();
+            if (studentName) {
+                nameError.textContent = '';
+                nameInput.classList.remove('border-red-500');
+                showSlide(2);
+            } else {
+                nameError.textContent = 'Por favor, ingresa tu nombre para continuar.';
+                nameInput.classList.add('border-red-500');
+                nameInput.focus();
+            }
+        }
+
+        // --- NEW DYNAMIC QUIZ LOGIC ---
+
+        const quizMasterData = {
+            quiz1: {
+                questions: [
+                    {
+                        question: "¿Por qué es útil especificar a la IA que genere retroalimentación para CADA opción?",
+                        options: [
+                            "Para que la evaluación sea más larga.",
+                            "Para convertir cada error en una oportunidad de aprendizaje inmediata.",
+                            "Porque es un requisito técnico de la IA.",
+                            "Para confundir a los estudiantes."
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "Al crear un prompt para una evaluación diagnóstica, ¿cuál es el objetivo MENOS importante?",
+                        options: [
+                            "Identificar conocimientos previos.",
+                            "Calificar y asignar una nota final.",
+                            "Detectar conceptos erróneos.",
+                            "Medir el interés del estudiante en el tema."
+                        ],
+                        correct: 1
+                    }
+                ]
+            },
+            quiz2: {
+                questions: [
+                    {
+                        question: "¿Por qué es valioso pedirle a la IA que genere recomendaciones personalizadas en una autoevaluación?",
+                        options: [
+                            "Para que el estudiante solo lea las felicitaciones.",
+                            "Para que la autoevaluación no sea solo un checklist, sino el inicio de un plan de mejora concreto.",
+                            "Para hacer la evaluación más larga y difícil.",
+                            "Para que la IA tenga más trabajo."
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "La evaluación formativa se enfoca principalmente en...",
+                        options: [
+                            "La calificación final del período.",
+                            "Comparar a los estudiantes entre sí.",
+                            "El proceso de aprendizaje y la retroalimentación para la mejora.",
+                            "Certificar las competencias adquiridas."
+                        ],
+                        correct: 2
+                    }
+                ]
+            },
+            quiz3: {
+                questions: [
+                     {
+                        question: "Incluir una sección de 'Análisis de Fuentes' en una evaluación sumativa ayuda a...",
+                        options: [
+                            "Evaluar habilidades superiores como el pensamiento crítico, en lugar de solo la memorización.",
+                            "Rellenar espacio para alcanzar el tiempo estimado de la prueba.",
+                            "Hacer la prueba más fácil de calificar.",
+                            "Asegurar que todos los estudiantes saquen la misma nota."
+                        ],
+                        correct: 0
+                    },
+                    {
+                        question: "¿Por qué es una buena práctica pedir a la IA que genere una rúbrica junto con la evaluación sumativa?",
+                        options: [
+                            "Para asegurar que los criterios de evaluación sean claros, objetivos y estén alineados con los objetivos de aprendizaje.",
+                            "Para que el documento de la evaluación sea más largo.",
+                            "Las rúbricas no son importantes en la evaluación.",
+                            "Para tener una excusa si los estudiantes reprueban."
+                        ],
+                        correct: 0
+                    }
+                ]
+            }
+        };
+
+        // This object will hold the current state of the quizzes (shuffled questions, scores, etc.)
+        let activeQuizData = {};
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function initializeQuizzes() {
+            // Deep copy master data to active data to avoid modifying the original
+            activeQuizData = JSON.parse(JSON.stringify(quizMasterData)); 
+            
+            Object.keys(activeQuizData).forEach(quizId => {
+                const quiz = activeQuizData[quizId];
+                quiz.scores = Array(quiz.questions.length).fill(0);
+                quiz.totalAnswered = 0;
+                shuffle(quiz.questions);
+                renderQuiz(quizId);
+            });
+        }
+        
+        function renderQuiz(quizId) {
+            const container = document.getElementById(`${quizId}-container`);
+            container.innerHTML = ''; // Clear previous render
+            const quiz = activeQuizData[quizId];
+
+            quiz.questions.forEach((q, questionIndex) => {
+                const questionCard = document.createElement('div');
+                questionCard.className = 'glass-card rounded-xl p-6 mb-4';
+                
+                const questionText = document.createElement('p');
+                questionText.className = 'text-lg font-semibold mb-4';
+                questionText.textContent = `Pregunta ${questionIndex + 1}/${quiz.questions.length}: ${q.question}`;
+                
+                const optionsGrid = document.createElement('div');
+                optionsGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+
+                q.options.forEach((optionText, optionIndex) => {
+                    const optionButton = document.createElement('button');
+                    optionButton.className = 'quiz-option p-4 border-2 border-gray-600 rounded-lg text-left';
+                    optionButton.textContent = optionText;
+                    optionButton.onclick = () => checkAnswer(quizId, questionIndex, optionIndex);
+                    optionsGrid.appendChild(optionButton);
+                });
+                
+                const feedbackText = document.createElement('p');
+                feedbackText.className = 'feedback mt-3 text-sm h-5';
+                
+                questionCard.appendChild(questionText);
+                questionCard.appendChild(optionsGrid);
+                questionCard.appendChild(feedbackText);
+                container.appendChild(questionCard);
+            });
+        }
+
+
+        function checkAnswer(quizId, questionIndex, selectedOption) {
+            const quiz = activeQuizData[quizId];
+            if (quiz.scores[questionIndex] !== 0) return; // Already answered
+
+            const questionContainer = document.getElementById(`${quizId}-container`).children[questionIndex];
+            const options = questionContainer.querySelectorAll('.quiz-option');
+            const feedback = questionContainer.querySelector('.feedback');
+            const correctAnswer = quiz.questions[questionIndex].correct;
+
+            quiz.totalAnswered++;
+            quiz.scores[questionIndex] = (selectedOption === correctAnswer) ? 1 : -1;
+
+            options[selectedOption].classList.add(selectedOption === correctAnswer ? 'correct' : 'incorrect');
+            if (selectedOption !== correctAnswer) {
+                 options[correctAnswer].classList.add('correct');
+                 feedback.textContent = 'Casi. La respuesta correcta está marcada en verde.';
+                 feedback.style.color = '#dc3545';
+            } else {
+                 feedback.textContent = '¡Correcto! Excelente análisis.';
+                 feedback.style.color = '#28a745';
+            }
+
+            options.forEach(button => button.disabled = true);
+            
+            if (quiz.totalAnswered === quiz.questions.length) {
+                showQuizResult(quizId);
+            }
+        }
+
+        function showQuizResult(quizId) {
+            const quiz = activeQuizData[quizId];
+            const correctCount = quiz.scores.filter(score => score === 1).length;
+            const totalQuestions = quiz.questions.length;
+            const percentage = (correctCount / totalQuestions) * 100;
+            const resultElement = document.getElementById(`${quizId}-result`);
+            resultElement.textContent = `Resultado: ${correctCount} de ${totalQuestions} correctas (${percentage.toFixed(0)}%)`;
+
+            const nextLinkId = `next-link-${quizId.slice(-1)}`;
+            document.getElementById(nextLinkId).classList.remove('hidden');
+        }
+
+        function updateFinalReport() {
+            Object.keys(activeQuizData).forEach((quizId, index) => {
+                const quiz = activeQuizData[quizId];
+                const correctCount = quiz.scores.filter(score => score === 1).length;
+                const totalQuestions = quiz.questions.length;
+                const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
+                
+                const i = index + 1;
+                document.getElementById(`score-label-${i}`).textContent = `${percentage.toFixed(0)}%`;
+                document.getElementById(`score-bar-${i}`).style.width = `${percentage}%`;
+            });
+        }
+
+        function resetAndStart() {
+            // Reset UI elements
+            Object.keys(quizMasterData).forEach(quizId => {
+                const i = quizId.slice(-1);
+                document.getElementById(`${quizId}-result`).textContent = '';
+                document.getElementById(`next-link-${i}`).classList.add('hidden');
+            });
+
+            // Clear name and input field
+            studentName = '';
+            const nameInput = document.getElementById('studentNameInput');
+            nameInput.value = '';
+            nameInput.classList.remove('border-red-500');
+            document.getElementById('name-error').textContent = '';
+
+
+            // Re-initialize quizzes with shuffled questions and fresh scores
+            initializeQuizzes();
+            updateFinalReport(); // Reset progress bars to 0%
+            showSlide(1);
+        }
+
+        // Slide navigation logic
+        function showSlide(slideNumber) {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('hidden', (index + 1) !== slideNumber);
+            });
+
+            if (slideNumber === 10) {
+                updateFinalReport();
+                const finalGreeting = document.getElementById('final-greeting');
+                const reportTitle = document.getElementById('report-title');
+
+                if (studentName) {
+                    // Sanitize name to prevent HTML injection
+                    const sanitizedName = studentName.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    finalGreeting.innerHTML = `¡Felicidades, <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-blue-400">${sanitizedName}</span>!`;
+                    reportTitle.textContent = `Informe de Aprendizaje de ${sanitizedName}`;
+                } else {
+                    finalGreeting.textContent = '¡Felicidades, has completado tu entrenamiento!';
+                    reportTitle.textContent = 'Tu Informe Final de Aprendizaje';
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeQuizzes();
+            showSlide(1);
+        });
+
+    </script>
+
+</body>
+</html>
+
