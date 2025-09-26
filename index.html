@@ -3,668 +3,676 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kit de Evaluación con IA - Módulo Interactivo</title>
+    <title>Centro de Misiones de Proyecto</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Inter:wght@400;500;700;900&family=Teko:wght@600&family=Montserrat:wght@400;700&family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: #0c1427;
+            background-image:
+                radial-gradient(at 27% 37%, hsla(215, 98%, 62%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 97% 21%, hsla(125, 98%, 72%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 52% 99%, hsla(355, 98%, 62%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 10% 29%, hsla(256, 96%, 67%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 97% 96%, hsla(38, 60%, 74%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 33% 50%, hsla(222, 67%, 73%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 79% 53%, hsla(343, 68%, 79%, 0.1) 0px, transparent 50%);
         }
-        .slide {
-            min-height: 100vh;
-        }
+        .font-condensed { font-family: 'Roboto Condensed', sans-serif; }
+        .font-teko { font-family: 'Teko', sans-serif; }
         .glass-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .btn-primary {
-            background-image: linear-gradient(to right, #8e2de2, #4a00e0);
+        .option-button:hover:not(:disabled) {
+            background-color: #00aaff;
+            border-color: #00aaff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 170, 255, 0.3);
         }
-        .btn-secondary {
-            background-image: linear-gradient(to right, #1d976c, #93f9b9);
+        .mission-card:not(.locked):hover {
+            transform: scale(1.02);
+            border-color: #00aaff;
+            box-shadow: 0 10px 30px rgba(0, 170, 255, 0.1);
         }
-        .quiz-option {
-            transition: all 0.3s ease;
+        .mission-card.locked {
+            filter: grayscale(80%);
         }
-        .quiz-option:hover:not(:disabled) {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        .progress-bar-fill { transition: width 0.5s ease-in-out; }
+        .modal-enter { animation: fadeIn 0.3s ease-out forwards; }
+        .modal-leave { animation: fadeOut 0.3s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.9); } }
+        
+        #diploma-screen {
+            background-color: #f8f9fa;
+            font-family: 'Montserrat', sans-serif;
         }
-        .correct {
-            background-color: #28a745 !important;
-            color: white !important;
-            border-color: #28a745 !important;
+        .diploma-container {
+            border: 1px solid #dee2e6;
+            background-color: #ffffff;
+            position: relative;
+            overflow: hidden;
         }
-        .incorrect {
-            background-color: #dc3545 !important;
-            color: white !important;
-            border-color: #dc3545 !important;
+        .diploma-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 199, 44, 0.1), transparent 30%);
+            animation: rotate 20s linear infinite;
         }
-        .prompt-pro {
-            background: #1a1a2e;
-            border-left: 4px solid #16c79a;
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .seal {
+            width: 130px;
+            height: 130px;
+            background: linear-gradient(145deg, #0A4D68, #083b50);
+            border-radius: 50%;
+            position: relative;
+            color: #FFC72C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 6px double #FFC72C;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .seal-text {
+            font-family: 'Teko', sans-serif;
+            font-size: 24px;
+            line-height: 1;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body class="text-white">
 
-    <div class="container mx-auto">
+    <div id="game-container" class="min-h-screen flex items-center justify-center p-4">
 
-        <!-- Slide 1: Portada -->
-        <section id="slide1" class="slide flex flex-col items-center justify-center text-center p-8 min-h-screen">
-            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-900 via-purple-900 to-gray-900 opacity-80" style="z-index: -1;"></div>
-            <h1 class="text-5xl md:text-7xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-blue-400 to-purple-500">Crea tu Kit de Evaluación con IA</h1>
-            <p class="text-xl md:text-2xl text-gray-300 mb-8">Un módulo interactivo para educadores innovadores</p>
-            <div class="mb-8 w-full max-w-md">
-                <input type="text" id="studentNameInput" placeholder="Escribe tu nombre completo aquí" class="w-full px-4 py-3 bg-white bg-opacity-20 border-2 border-gray-400 rounded-full text-center text-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-green-300 transition-all">
-                <p id="name-error" class="text-red-400 text-sm mt-2 h-5"></p>
-            </div>
-            <a href="#" onclick="event.preventDefault(); startAdventure();" class="px-8 py-4 rounded-full text-lg font-bold text-white btn-primary transition-transform transform hover:scale-105">¡Comenzar la Aventura!</a>
-        </section>
-
-        <!-- Slide 2: El Poder de la Evaluación -->
-        <section id="slide2" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen">
-            <div class="w-full flex-grow flex flex-col items-center justify-center">
-                <h2 class="text-4xl font-bold mb-6 text-center">La Evaluación es más que una Nota</h2>
-                <p class="text-lg text-gray-400 mb-12 text-center max-w-3xl">No es solo la línea de meta. Es la <span class="text-yellow-400 font-semibold">brújula</span> que nos guía, el <span class="text-blue-400 font-semibold">retrovisor</span> que nos enseña del camino y el <span class="text-green-400 font-semibold">combustible</span> que impulsa el aprendizaje.</p>
-                <div class="grid md:grid-cols-3 gap-8 w-full max-w-5xl">
-                    <div class="glass-card p-6 rounded-2xl text-center">
-                        <div class="text-5xl mb-4">🧭</div>
-                        <h3 class="text-2xl font-bold mb-2">Brújula</h3>
-                        <p>Identifica conocimientos previos y orienta la enseñanza.</p>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl text-center">
-                        <div class="text-5xl mb-4">🔧</div>
-                        <h3 class="text-2xl font-bold mb-2">Retrovisor</h3>
-                        <p>Ofrece retroalimentación para mejorar y aprender del error.</p>
-                    </div>
-                    <div class="glass-card p-6 rounded-2xl text-center">
-                        <div class="text-5xl mb-4">🚀</div>
-                        <h3 class="text-2xl font-bold mb-2">Combustible</h3>
-                        <p>Certifica lo aprendido y motiva a seguir creciendo.</p>
-                    </div>
-                </div>
-            </div>
-             <a href="#" onclick="event.preventDefault(); showSlide(3);" class="px-8 py-3 rounded-full text-lg font-bold text-gray-900 btn-secondary transition-transform transform hover:scale-105">Entendido, ¡siguiente!</a>
-        </section>
-
-        <!-- Slide 3: Conceptos Clave para Prompts -->
-        <section id="slide3" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen">
-            <div class="w-full flex-grow flex flex-col items-center justify-center">
-                <h2 class="text-4xl font-bold mb-10 text-center">Ingredientes de un Prompt Poderoso</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl w-full">
-                    <div class="glass-card p-6 rounded-xl text-center cursor-pointer hover:bg-purple-700 transition-colors" onclick="showTip('Contexto', 'Define el nivel educativo, materia y características del grupo. La IA necesita saber para QUIÉN es la evaluación.')">
-                        <div class="text-4xl mb-3">🎓</div><h3 class="text-xl font-bold">Contexto</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-xl text-center cursor-pointer hover:bg-purple-700 transition-colors" onclick="showTip('Tarea', 'Usa verbos de acción claros: genera, diseña, crea. Indica el TIPO de instrumento: test, rúbrica, encuesta.')">
-                        <div class="text-4xl mb-3">🎯</div><h3 class="text-xl font-bold">Tarea</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-xl text-center cursor-pointer hover:bg-purple-700 transition-colors" onclick="showTip('Formato', 'Especifica CÓMO quieres la respuesta: ¿en una tabla?, ¿con viñetas?, ¿con justificación y retroalimentación?')">
-                        <div class="text-4xl mb-3">📄</div><h3 class="text-xl font-bold">Formato</h3>
-                    </div>
-                    <div class="glass-card p-6 rounded-xl text-center cursor-pointer hover:bg-purple-700 transition-colors" onclick="showTip('Restricciones', 'Ponle límites a la IA: complejidad cognitiva (Bloom), longitud, tiempo estimado, exclusión de temas sensibles.')">
-                        <div class="text-4xl mb-3">🚧</div><h3 class="text-xl font-bold">Restricciones</h3>
-                    </div>
-                </div>
-                <p class="mt-8 text-gray-400">Haz clic en cada tarjeta para un Pro Tip.</p>
-            </div>
-            <a href="#" onclick="event.preventDefault(); showSlide(4);" class="px-8 py-3 rounded-full text-lg font-bold text-white btn-primary transition-transform transform hover:scale-105">¡A crear la primera evaluación!</a>
-        </section>
-
-        <!-- Modal para Tips -->
-        <div id="tipModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden z-50">
-            <div class="bg-gray-800 rounded-2xl p-8 max-w-lg w-full text-center border border-purple-500 shadow-lg">
-                <h3 id="tipTitle" class="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-blue-400"></h3>
-                <p id="tipText" class="text-lg text-gray-300 mb-6"></p>
-                <button class="px-6 py-2 rounded-full text-lg font-bold text-white btn-primary" onclick="closeModal()">¡Entendido!</button>
+        <!-- Name Input Screen -->
+        <div id="name-screen" class="text-center w-full max-w-lg mx-auto">
+            <h1 class="text-4xl md:text-5xl font-black font-condensed uppercase tracking-wider mb-4 text-cyan-400">ACCESO AL CENTRO DE ENTRENAMIENTO</h1>
+            <p class="text-gray-300 mb-8">Identifícate para iniciar tu carrera como Jefe/a de Proyecto.</p>
+            <div class="glass-card rounded-2xl p-8">
+                <label for="player-name" class="block mb-2 text-lg font-bold">Introduce tu nombre:</label>
+                <input type="text" id="player-name" class="w-full bg-gray-900 text-white text-center text-xl p-3 rounded-lg border-2 border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Tu Nombre Aquí">
+                <button id="submit-name-button" class="mt-6 w-full bg-cyan-500 text-black font-bold text-xl py-3 px-10 rounded-full transition-transform transform hover:scale-105 shadow-lg shadow-cyan-500/30">Ingresar a Misiones</button>
             </div>
         </div>
 
-        <!-- Parte 1: Evaluación Diagnóstica -->
-        <section id="slide4" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen bg-gradient-to-b from-gray-900 to-blue-900">
-            <div class="w-full flex-grow flex flex-col items-center justify-center">
-                <h2 class="text-xl font-bold text-blue-300 mb-2">PARTE 1: LA EVALUACIÓN DIAGNÓSTICA</h2>
-                <h3 class="text-4xl font-bold text-center mb-6">El Punto de Partida: ¿Qué saben mis estudiantes?</h3>
-                
-                <div class="glass-card rounded-2xl p-6 mb-6 w-full max-w-5xl">
-                    <h4 class="text-2xl font-bold mb-3 text-center">Conceptos Clave</h4>
-                    <div class="grid md:grid-cols-3 gap-4 text-sm text-center">
-                        <div>
-                            <p class="font-bold text-blue-300">🎯 ¿Qué es?</p>
-                            <p class="text-gray-300">Es una foto inicial para entender desde dónde parten tus estudiantes: sus conocimientos previos, habilidades e interés por el tema. No es para calificar.</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-blue-300">💡 Tips de Uso</p>
-                            <p class="text-gray-300">Sé breve y enfocado. Usa formatos variados (imágenes, preguntas rápidas). Analiza los resultados para ajustar tu plan de clase, no para poner una nota.</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-blue-300">🤖 Superpoder con IA</p>
-                            <p class="text-gray-300">Pide a la IA que cree "mapas de conceptos erróneos" sobre un tema para que tus preguntas apunten a las confusiones más comunes.</p>
-                        </div>
+        <!-- Main Menu -->
+        <div id="main-menu" class="hidden text-center w-full max-w-7xl mx-auto">
+            <h1 class="text-5xl md:text-6xl font-black font-condensed uppercase tracking-wider mb-2 text-cyan-400">CENTRO DE ENTRENAMIENTO</h1>
+            <p id="welcome-message" class="text-gray-300 text-xl mb-10"></p>
+            <div id="missions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+                <!-- Mission cards will be injected here -->
+            </div>
+            <button id="reset-all-button" class="bg-red-600 text-white font-bold py-2 px-6 rounded-full transition-transform transform hover:scale-105">REINICIAR TODO EL PROGRESO</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden w-full max-w-4xl">
+             <div class="flex justify-start mb-4">
+                <button id="back-to-menu-btn" class="bg-gray-700 text-white font-bold py-2 px-4 rounded-full hover:bg-gray-600">← Volver al Menú</button>
+            </div>
+            <div id="status-bar" class="mb-6">
+                <div class="flex justify-between items-center mb-2 text-gray-300 font-condensed">
+                    <span id="stage-name" class="text-xl tracking-wider"></span>
+                    <span id="score" class="text-xl"></span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-4"><div id="progress-bar" class="bg-gradient-to-r from-cyan-400 to-blue-500 h-4 rounded-full progress-bar-fill" style="width: 0%"></div></div>
+            </div>
+            <div class="glass-card rounded-2xl p-8">
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-3xl font-bold mr-4 shrink-0"><span id="avatar"></span></div>
+                    <div>
+                        <h3 id="question-title" class="text-2xl font-bold"></h3>
+                        <p id="question-text" class="text-gray-300"></p>
                     </div>
                 </div>
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </div>
 
-                <div class="w-full max-w-5xl space-y-6">
-                    <div class="glass-card rounded-2xl p-8">
-                        <h4 class="text-2xl font-bold mb-4">Ejemplo Aplicado Completo</h4>
-                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-left">
-                            <p><span class="text-purple-400">"Actúa como un docente de primaria experto.</span> Necesito crear una evaluación diagnóstica sobre <span class="text-yellow-400">'el ciclo del agua'</span> para estudiantes de <span class="text-yellow-400">9 años (grado 4)</span>. El objetivo es identificar sus conocimientos previos y posibles conceptos erróneos. La evaluación debe ser amigable y visual.
-                            <br><br>
-                            <span class="text-cyan-400">Genera lo siguiente:</span>
-                            <br>
-                            1. <span class="text-green-400">Tres preguntas de opción múltiple</span> con 4 opciones cada una. Indica la correcta y proporciona una <span class="text-pink-400">retroalimentación inmediata y sencilla</span> para CADA opción, explicando por qué es correcta o incorrecta.
-                            <br>
-                            2. <span class="text-green-400">Una pregunta abierta</span> que incentive la curiosidad: 'Si fueras una gotita de agua, ¿qué viaje te gustaría hacer? Describe una parada en tu aventura.'
-                            <br>
-                            <span class="text-orange-400">El tono debe ser motivador y el tiempo total no debe exceder los 15 minutos.</span>"</p>
-                        </div>
+        <!-- Results Screen -->
+        <div id="results-screen" class="hidden w-full max-w-4xl">
+            <div class="flex justify-start mb-4">
+                <button id="results-back-to-menu-btn" class="bg-gray-700 text-white font-bold py-2 px-4 rounded-full hover:bg-gray-600">← Volver al Menú</button>
+            </div>
+            <h2 id="results-title" class="text-4xl font-bold font-condensed text-cyan-400 mb-6 text-center">INFORME DE MISIÓN</h2>
+            <div id="results-container" class="space-y-4"></div>
+        </div>
+
+        <!-- Diploma Screen -->
+        <div id="diploma-screen" class="hidden w-full max-w-5xl mx-auto text-[#0A4D68]">
+            <div class="diploma-container p-10 rounded-lg shadow-2xl relative">
+                <div class="text-center z-10 relative">
+                    <h2 class="text-2xl font-condensed tracking-widest text-gray-500">CERTIFICADO DE FINALIZACIÓN</h2>
+                    <h1 class="text-6xl font-black font-teko text-[#0A4D68] mt-2 mb-4">ESPECIALISTA EN GESTIÓN DE PROYECTOS</h1>
+                    <p class="text-base text-gray-600">Este certificado se otorga a:</p>
+                    <p id="diploma-name" class="text-5xl my-6 text-[#0A4D68]" style="font-family: 'Great Vibes', cursive;">Jefe/a de Proyecto</p>
+                    <p class="text-base text-gray-600 max-w-3xl mx-auto">Por haber completado exitosamente el entrenamiento intensivo, demostrando dominio en las siguientes competencias fundamentales de la gestión de proyectos:</p>
+                </div>
+                <div class="grid grid-cols-2 gap-x-12 gap-y-4 my-8 text-sm max-w-3xl mx-auto z-10 relative">
+                    <div class="flex items-center"><span class="text-teal-500 mr-3 text-lg">✓</span><span>Análisis de Proyectos vs. Operaciones</span></div>
+                    <div class="flex items-center"><span class="text-teal-500 mr-3 text-lg">✓</span><span>Dominio del Ciclo de Vida del Proyecto</span></div>
+                    <div class="flex items-center"><span class="text-teal-500 mr-3 text-lg">✓</span><span>Selección Estratégica de Metodologías</span></div>
+                    <div class="flex items-center"><span class="text-teal-500 mr-3 text-lg">✓</span><span>Definición de Objetivos S.M.A.R.T.</span></div>
+                    <div class="flex items-center"><span class="text-teal-500 mr-3 text-lg">✓</span><span>Gestión y Control de Alcance</span></div>
+                    <div class="flex items-center"><span class="text-teal-500 mr-3 text-lg">✓</span><span>Estructura de Desglose del Trabajo (EDT)</span></div>
+                    <div class="flex items-center"><span class="text-teal-500 mr-3 text-lg">✓</span><span>Asignación Eficiente de Recursos</span></div>
+                    <div class="flex items-center"><span class="text-teal-500 mr-3 text-lg">✓</span><span>Planificación y Creación de Cronogramas</span></div>
+                    <div class="flex items-center"><span class="text-teal-500 mr-3 text-lg">✓</span><span>Técnicas de Ejecución y Comunicación</span></div>
+                    <div class="flex items-center"><span class="text-teal-500 mr-3 text-lg">✓</span><span>Principios de Monitoreo y Finanzas</span></div>
+                </div>
+                <div class="flex justify-between items-center mt-10 z-10 relative">
+                    <div class="text-center">
+                        <p class="font-bold text-lg border-b-2 border-[#0A4D68] pb-1 px-4">Instructor Principal</p>
+                        <p class="text-sm mt-1">Talento Tech</p>
                     </div>
-                    <div class="glass-card rounded-2xl p-8">
-                        <h4 class="text-2xl font-bold mb-4">🚀 Prompt PRO para Crear en HTML</h4>
-                         <p class="text-gray-300 mb-4">Copia y pega este prompt en Gemini para crear una mini-evaluación interactiva.</p>
-                         <div class="prompt-pro rounded-lg p-4 font-mono text-xs text-left">
-                            <p class="font-bold text-green-400 mb-2"># Prompt para un quiz diagnóstico interactivo:</p>
-                            <p>"Actúa como un desarrollador EdTech experto. Crea un archivo HTML único para una evaluación diagnóst-ica interactiva sobre <span class="text-yellow-400">'Las partes de una planta'</span> para niños de 8 años.
-                            <br><br>
-                            Debe incluir 2 preguntas de opción múltiple. Cada pregunta debe tener 3 opciones. Al hacer clic en una opción, el botón debe cambiar a color verde (si es correcta) o rojo (si es incorrecta) y mostrar una breve retroalimentación debajo. El diseño debe ser muy visual, con fuentes grandes, colores primarios vivos (azul, amarillo, verde) y esquinas redondeadas. Usa Tailwind CSS."</p>
-                        </div>
+                    <div class="seal">
+                        <span class="seal-text">LOGRO<br>ALCANZADO</span>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold text-lg border-b-2 border-[#0A4D68] pb-1 px-4">Fecha de Emisión</p>
+                        <p id="diploma-date" class="text-sm mt-1">18 de Septiembre, 2025</p>
                     </div>
                 </div>
             </div>
-            <a href="#" onclick="event.preventDefault(); showSlide(5);" class="mt-8 px-8 py-3 rounded-full text-lg font-bold text-gray-900 btn-secondary transition-transform transform hover:scale-105">¡A comprobar tu conocimiento!</a>
-        </section>
-
-        <!-- Quiz 1: Diagnóstica -->
-        <section id="slide5" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen">
-             <div class="w-full flex-grow flex flex-col items-center justify-center">
-                <h2 class="text-3xl font-bold mb-8 text-center">Test Rápido: El Prompt Diagnóstico</h2>
-                <div id="quiz1-container" class="w-full max-w-3xl">
-                    <!-- Las preguntas se generan dinámicamente aquí -->
-                </div>
-                <div id="quiz1-result" class="mt-8 text-2xl font-bold text-center"></div>
+             <div class="text-center mt-8">
+                <button onclick="window.print()" class="bg-[#0A4D68] text-white font-bold py-2 px-6 rounded-full mr-4 hover:opacity-90 transition-opacity">Imprimir Certificado</button>
+                <button id="diploma-back-to-menu-btn" class="bg-gray-600 text-white font-bold py-2 px-4 rounded-full hover:bg-gray-500 transition-colors">Volver al Menú</button>
             </div>
-            <a href="#" id="next-link-1" class="hidden mt-8 px-8 py-3 rounded-full text-lg font-bold text-white btn-primary transition-transform transform hover:scale-105" onclick="event.preventDefault(); showSlide(6);">Continuar a la Evaluación Formativa</a>
-        </section>
-        
-        <!-- Parte 2: Evaluación Formativa -->
-        <section id="slide6" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen bg-gradient-to-b from-gray-900 to-green-900">
-             <div class="w-full flex-grow flex flex-col items-center justify-center">
-                <h2 class="text-xl font-bold text-green-300 mb-2">PARTE 2: LA EVALUACIÓN FORMATIVA</h2>
-                <h3 class="text-4xl font-bold text-center mb-6">El Proceso: ¿Vamos por buen camino?</h3>
-                
-                <div class="glass-card rounded-2xl p-6 mb-6 w-full max-w-5xl">
-                    <h4 class="text-2xl font-bold mb-3 text-center">Conceptos Clave</h4>
-                    <div class="grid md:grid-cols-3 gap-4 text-sm text-center">
-                        <div>
-                            <p class="font-bold text-green-300">🎯 ¿Qué es?</p>
-                            <p class="text-gray-300">Es el GPS del aprendizaje. Se realiza *durante* el proceso para monitorear el progreso y ofrecer retroalimentación constante. Su objetivo es mejorar, no juzgar.</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-green-300">💡 Tips de Uso</p>
-                            <p class="text-gray-300">Debe ser frecuente, corta y de bajo riesgo (sin nota). La retroalimentación debe ser inmediata, clara y accionable. Fomenta la autoevaluación.</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-green-300">🤖 Superpoder con IA</p>
-                            <p class="text-gray-300">Pide a la IA que diseñe "tickets de salida" interactivos de 3 minutos, o que genere bancos de preguntas que se adapten a las respuestas del estudiante.</p>
-                        </div>
-                    </div>
-                </div>
-                 
-                 <div class="w-full max-w-5xl space-y-6">
-                    <div class="glass-card rounded-2xl p-8">
-                        <h4 class="text-2xl font-bold mb-4">Ejemplo Aplicado Completo</h4>
-                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-left">
-                            <p><span class="text-purple-400">"Actúa como un coach de aprendizaje para adolescentes.</span> Crea una pauta de autoevaluación sobre la competencia <span class="text-yellow-400">'trabajo en equipo en un proyecto de ciencias'</span> para estudiantes de <span class="text-yellow-400">14 años</span>.
-                            <br><br>
-                            <span class="text-cyan-400">Estructura:</span>
-                            <br>
-                            1. <span class="text-green-400">Cinco afirmaciones en primera persona</span> para que el estudiante califique de 1 (casi nunca) a 5 (casi siempre).
-                            <br>
-                            2. <span class="text-green-400">Incluye aspectos de contribución</span> ('Aporto ideas al grupo') y <span class="text-green-400">aspectos socioemocionales</span> ('Escucho y respeto las opiniones de mis compañeros').
-                            <br>
-                            3. Al final, proporciona una <span class="text-pink-400">recomendación personalizada y accionable</span> basada en el puntaje total obtenido (ej: para puntajes bajos, medios y altos), enfocada en cómo mejorar."</p>
-                        </div>
-                    </div>
-                    <div class="glass-card rounded-2xl p-8">
-                        <h4 class="text-2xl font-bold mb-4">🚀 Prompt PRO para Crear en HTML</h4>
-                         <p class="text-gray-300 mb-4">Copia este prompt para generar una herramienta de autoevaluación interactiva.</p>
-                         <div class="prompt-pro rounded-lg p-4 font-mono text-xs text-left">
-                            <p class="font-bold text-green-400 mb-2"># Prompt para una autoevaluación interactiva:</p>
-                            <p>"Crea un archivo HTML único para una autoevaluación interactiva sobre <span class="text-yellow-400">'Mis hábitos de estudio'</span> para estudiantes de secundaria.
-                            <br><br>
-                            Incluye 3 afirmaciones. Cada una debe tener una escala de 1 a 5 (como botones seleccionables). Cuando el usuario presione un botón 'Ver mi recomendación' al final, debe aparecer un texto con un consejo personalizado simple basado en la puntuación promedio. Si el promedio es menor a 3, el consejo debe ser de mejora; si es mayor, de felicitación. Usa Tailwind CSS, un diseño limpio, colores verdes y azules, y texto claro y legible."</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <a href="#" onclick="event.preventDefault(); showSlide(7);" class="mt-8 px-8 py-3 rounded-full text-lg font-bold text-gray-900 btn-secondary transition-transform transform hover:scale-105">¡A comprobar este nuevo saber!</a>
-        </section>
-
-        <!-- Quiz 2: Formativa -->
-        <section id="slide7" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen">
-            <div class="w-full flex-grow flex flex-col items-center justify-center">
-                <h2 class="text-3xl font-bold mb-8 text-center">Test Rápido: El Prompt Formativo</h2>
-                <div id="quiz2-container" class="w-full max-w-3xl">
-                    <!-- Las preguntas se generan dinámicamente aquí -->
-                </div>
-                <div id="quiz2-result" class="mt-8 text-2xl font-bold text-center"></div>
-            </div>
-            <a href="#" id="next-link-2" class="hidden mt-8 px-8 py-3 rounded-full text-lg font-bold text-white btn-primary transition-transform transform hover:scale-105" onclick="event.preventDefault(); showSlide(8);">Continuar a la Evaluación Sumativa</a>
-        </section>
-
-        <!-- Parte 3: Evaluación Sumativa -->
-        <section id="slide8" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen bg-gradient-to-b from-gray-900 to-red-900">
-             <div class="w-full flex-grow flex flex-col items-center justify-center">
-                <h2 class="text-xl font-bold text-red-300 mb-2">PARTE 3: LA EVALUACIÓN SUMATIVA</h2>
-                <h3 class="text-4xl font-bold text-center mb-6">La Meta: ¿Qué hemos aprendido?</h3>
-                
-                <div class="glass-card rounded-2xl p-6 mb-6 w-full max-w-5xl">
-                    <h4 class="text-2xl font-bold mb-3 text-center">Conceptos Clave</h4>
-                    <div class="grid md:grid-cols-3 gap-4 text-sm text-center">
-                        <div>
-                            <p class="font-bold text-red-300">🎯 ¿Qué es?</p>
-                            <p class="text-gray-300">Es la foto final del viaje. Busca certificar lo que el estudiante ha aprendido al final de una unidad. Generalmente, tiene una calificación formal.</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-red-300">💡 Tips de Uso</p>
-                            <p class="text-gray-300">Debe reflejar los objetivos de aprendizaje. Combina diferentes tipos de preguntas para evaluar distintas habilidades (memorizar vs. analizar). Usa rúbricas claras.</p>
-                        </div>
-                        <div>
-                            <p class="font-bold text-red-300">🤖 Superpoder con IA</p>
-                            <p class="text-gray-300">Pide a la IA que diseñe evaluaciones basadas en proyectos o casos realistas. Solicita múltiples versiones de un examen o que genere rúbricas muy detalladas.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="w-full max-w-5xl space-y-6">
-                    <div class="glass-card rounded-2xl p-8">
-                        <h4 class="text-2xl font-bold mb-4">Ejemplo Aplicado Completo</h4>
-                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-left">
-                            <p><span class="text-purple-400">"Actúa como un evaluador experto para educación superior.</span> Necesito una evaluación sumativa sobre <span class="text-yellow-400">'Las causas de la Primera Guerra Mundial'</span> para estudiantes de <span class="text-yellow-400">16 años</span>.
-                            <br><br>
-                            <span class="text-cyan-400">Diseña una evaluación de 50 minutos que contenga:</span>
-                            <br>
-                            1. <span class="text-green-400">Sección de Conocimiento (40%):</span> Cuatro preguntas de opción múltiple con retroalimentación para cada opción.
-                            <br>
-                            2. <span class="text-green-400">Sección de Análisis de Fuentes (60%):</span> Presenta un breve texto de un historiador (simúlalo) y pide al estudiante que responda una pregunta abierta que requiera análisis crítico.
-                            <br><br>
-                            <span class="text-pink-400">Finalmente, genera una rúbrica detallada</span> para evaluar la pregunta abierta, con 3 niveles de desempeño (sobresaliente, suficiente, insuficiente) y criterios claros como 'Uso de evidencia', 'Argumentación' y 'Claridad'."</p>
-                        </div>
-                    </div>
-                    <div class="glass-card rounded-2xl p-8">
-                        <h4 class="text-2xl font-bold mb-4">🚀 Prompt PRO 2.0 para Examen Interactivo</h4>
-                         <p class="text-gray-300 mb-4">El prompt anterior era bueno, ¡pero este es de otro nivel! Está diseñado para solucionar los problemas que mencionaste (evaluación de texto, puntuación, etc.) y crear una experiencia mucho más dinámica.</p>
-                         <div class="prompt-pro rounded-lg p-4 font-mono text-xs text-left">
-                            <p class="font-bold text-green-400 mb-2"># Prompt para un examen sumativo interactivo avanzado:</p>
-                            <p>"Eres un experto desarrollador Full-Stack y diseñador instruccional especializado en gamificación (EdTech). Genera un archivo HTML único para un examen final interactivo y visualmente impactante sobre 'El Sistema Solar', diseñado para estudiantes de 10 años.
-                            <br><br>
-                            <span class="text-yellow-400">Requisitos de Funcionalidad:</span>
-                            <br>
-                            1.  <span class="font-bold">Pantalla de Inicio Personalizada:</span> Antes de empezar, muestra una pantalla de bienvenida que pida al estudiante su nombre en un campo de texto y un botón para 'Empezar Examen'.
-                            <br>
-                            2.  <span class="font-bold">Preguntas Una por Una:</span> Las preguntas deben aparecer de una en una. Al responder, aparecerá un botón 'Siguiente'.
-                            <br>
-                            3.  <span class="font-bold">Retroalimentación Inmediata:</span> Para preguntas de opción múltiple, la opción seleccionada se ilumina (verde/correcta, rojo/incorrecta) y aparece un texto de feedback.
-                            <br>
-                            4.  <span class="font-bold">Evaluación de IA para Texto:</span> Incluye una pregunta de respuesta corta. Al evaluarla, simula una IA que busca palabras clave (ej: 'energía', 'luz', 'calor') y da feedback inmediato y acertado. ¡Asegúrate de que tu lógica de IA reconozca respuestas correctas como 'Proporciona energía'!
-                            <br>
-                            5.  <span class="font-bold">Puntuación Detallada:</span> Las dos primeras preguntas valen 15 puntos cada una. La tercera (texto) vale 20 puntos. El total es de 50 puntos.
-                            <br>
-                            6.  <span class="font-bold">Pantalla Final Personalizada y Motivadora:</span> Al terminar, muestra un mensaje como '¡Excelente trabajo, [Nombre del Estudiante]!', seguido del puntaje total (ej: '45/50 puntos') y un mensaje motivador que varíe según el desempeño.
-                            <br><br>
-                            <span class="text-yellow-400">Contenido de las Preguntas:</span>
-                            <br>
-                            -   P1 (Opción Múltiple): '¿Cuál es el planeta más grande del Sistema Solar?' (Júpiter es la correcta).
-                            <br>
-                            -   P2 (Opción Múltiple): '¿Qué planeta es conocido como el Planeta Rojo?' (Marte es la correcta).
-                            <br>
-                            -   P3 (Respuesta Corta): 'Describe con una frase corta la función principal del Sol.'
-                            <br><br>
-                            <span class="text-yellow-400">Requisitos de Diseño:</span>
-                            <br>
-                            Usa Tailwind CSS. El diseño debe ser muy gráfico, con un fondo oscuro de estrellas, colores vibrantes y neones para los elementos interactivos, fuentes grandes y claras (Poppins), y animaciones suaves para las transiciones."</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <a href="#" onclick="event.preventDefault(); showSlide(9);" class="mt-8 px-8 py-3 rounded-full text-lg font-bold text-gray-900 btn-secondary transition-transform transform hover:scale-105">¡Último desafío!</a>
-        </section>
-
-        <!-- Quiz 3: Sumativa -->
-        <section id="slide9" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen">
-            <div class="w-full flex-grow flex flex-col items-center justify-center">
-                <h2 class="text-3xl font-bold mb-8 text-center">Test Rápido: El Prompt Sumativo</h2>
-                <div id="quiz3-container" class="w-full max-w-3xl">
-                   <!-- Las preguntas se generan dinámicamente aquí -->
-                </div>
-                <div id="quiz3-result" class="mt-8 text-2xl font-bold text-center"></div>
-            </div>
-            <a href="#" id="next-link-3" class="hidden mt-8 px-8 py-3 rounded-full text-lg font-bold text-white btn-primary transition-transform transform hover:scale-105" onclick="event.preventDefault(); showSlide(10);">Ver mi informe final</a>
-        </section>
-
-        <!-- Parte 4: Reporte Final -->
-        <section id="slide10" class="slide flex flex-col items-center justify-between p-8 lg:p-16 min-h-screen bg-gradient-to-b from-gray-900 to-purple-900">
-             <div class="w-full flex-grow flex flex-col items-center justify-center">
-                <h2 id="final-greeting" class="text-4xl font-bold text-center mb-6">¡Felicidades, has completado tu entrenamiento!</h2>
-                <p class="text-lg text-gray-400 mb-10 text-center max-w-3xl">Has demostrado entender los fundamentos para crear evaluaciones de alto impacto con IA. La práctica constante te convertirá en un maestro.</p>
-                
-                <div class="w-full max-w-2xl">
-                    <div class="glass-card rounded-2xl p-8">
-                        <h3 id="report-title" class="text-3xl font-bold mb-6 text-center">Tu Informe Final de Aprendizaje</h3>
-                        <div class="space-y-6">
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-base font-medium text-blue-300">Dominio: Evaluación Diagnóstica</span>
-                                    <span id="score-label-1" class="text-sm font-medium text-blue-300">0%</span>
-                                </div>
-                                <div class="w-full bg-gray-700 rounded-full h-4">
-                                    <div id="score-bar-1" class="bg-blue-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-base font-medium text-green-300">Dominio: Evaluación Formativa</span>
-                                    <span id="score-label-2" class="text-sm font-medium text-green-300">0%</span>
-                                </div>
-                                <div class="w-full bg-gray-700 rounded-full h-4">
-                                    <div id="score-bar-2" class="bg-green-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex justify-between mb-1">
-                                    <span class="text-base font-medium text-red-300">Dominio: Evaluación Sumativa</span>
-                                    <span id="score-label-3" class="text-sm font-medium text-red-300">0%</span>
-                                </div>
-                                <div class="w-full bg-gray-700 rounded-full h-4">
-                                    <div id="score-bar-3" class="bg-red-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="mt-8 text-center text-gray-300">Recuerda: la mejor forma de aprender es <span class="font-bold text-yellow-300">creando</span>. ¡Usa los Prompts PRO y empieza a construir tus propias evaluaciones interactivas!</p>
-                    </div>
-                </div>
-            </div>
-             <a href="#" onclick="event.preventDefault(); resetAndStart();" class="mt-8 px-8 py-3 rounded-full text-lg font-bold text-gray-900 btn-secondary transition-transform transform hover:scale-105">Volver al inicio y practicar de nuevo</a>
-        </section>
-
+        </div>
     </div>
 
-    <script>
-        // Modal Logic
-        const modal = document.getElementById('tipModal');
-        const modalTitle = document.getElementById('tipTitle');
-        const modalText = document.getElementById('tipText');
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div class="glass-card rounded-2xl p-8 max-w-lg w-full text-center modal-enter">
+            <h3 id="feedback-title" class="text-3xl font-bold mb-4"></h3>
+            <p id="feedback-text" class="text-gray-300 mb-6"></p>
+            <button id="next-button" class="bg-blue-500 text-white font-bold py-2 px-8 rounded-full transition-transform transform hover:scale-105">CONTINUAR</button>
+        </div>
+    </div>
 
-        function showTip(title, text) {
-            modalTitle.innerText = title;
-            modalText.innerText = text;
-            modal.classList.remove('hidden');
-        }
+<script>
+const missions = {
+    lab1: {
+        title: "Operación: Cimientos",
+        challenge: "Un proyecto nace o muere en sus fundamentos. Demuestra que puedes distinguir una misión real de una simple tarea y guiarla desde su nacimiento.",
+        icon: "🚀",
+        totalQuestions: 10,
+        data: [
+            { stage: "Misión 1/10: Identidad", avatar: "🚀", title: "Informe de Mantenimiento", text: "El equipo de TI te informa que van a realizar el 'mantenimiento mensual de servidores'. ¿Debes gestionarlo como un nuevo proyecto?", options: [ { text: "No, es una operación de rutina.", isCorrect: true }, { text: "Sí, todo lo que hace TI es un proyecto.", isCorrect: false }, { text: "Depende de si usan software nuevo.", isCorrect: false }, { text: "Sí, porque requiere tiempo y personal.", isCorrect: false } ], feedback_correct: "¡Exacto! El mantenimiento es repetitivo y continuo. Es una OPERACIÓN. Un PROYECTO es temporal y crea algo único. ¡Distinguirlos es tu primer deber!", feedback_incorrect: "¡Cuidado! Si tratas las operaciones de rutina como proyectos, te ahogarás en papeleo. Los proyectos son para crear algo nuevo, no para mantener lo que ya existe." },
+            { stage: "Misión 2/10: Unicidad", avatar: "✨", title: "Proyecto 'Déjà Vu'", text: "Construiste una casa para un cliente. Ahora, su vecino quiere una exactamente igual. ¿Este segundo trabajo se considera un proyecto?", options: [ { text: "No, es una operación porque es repetitivo.", isCorrect: false }, { text: "Sí, porque tiene un cliente, ubicación y desafíos únicos.", isCorrect: true }, { text: "Solo si el presupuesto es diferente.", isCorrect: false }, { text: "No, porque el plano es el mismo.", isCorrect: false } ], feedback_correct: "¡Correcto! Aunque sea similar, es un proyecto ÚNICO. Tiene diferentes stakeholders (el vecino), una ubicación distinta y sus propias restricciones. ¡No hay dos proyectos iguales!", feedback_incorrect: "Incorrecto. Incluso si el producto final es casi idéntico, las circunstancias (cliente, entorno, equipo) lo convierten en un esfuerzo único, y por lo tanto, en un proyecto." },
+            { stage: "Misión 3/10: Temporalidad", avatar: "⏳", title: "Lanzamiento de App", text: "Tu equipo ha lanzado con éxito la versión 1.0 de una nueva aplicación. ¿En qué momento termina el PROYECTO de desarrollo?", options: [ { text: "Nunca, siempre hay que actualizarla.", isCorrect: false }, { text: "Cuando se entrega el resultado único y se aprueba.", isCorrect: true }, { text: "Cuando el equipo se cansa del proyecto.", isCorrect: false }, { text: "Cuando se agota el presupuesto inicial.", isCorrect: false } ], feedback_correct: "¡Perfecto! El proyecto termina al entregar el resultado único acordado (la v1.0). El trabajo que sigue (mantenimiento, actualizaciones) se convierte en una OPERACIÓN continua.", feedback_incorrect: "No exactamente. El desarrollo de la primera versión es el proyecto (temporal). El mantenimiento y las futuras actualizaciones son operaciones o nuevos proyectos." },
+            { stage: "Misión 4/10: Ciclo de Vida - Inicio", avatar: "🌱", title: "¡Luz Verde para TransLog!", text: "Acabas de recibir la aprobación oficial y el presupuesto inicial para el proyecto de logística de TransLog. ¿En qué fase del ciclo de vida te encuentras?", options: [ { text: "En la Ejecución, ¡a trabajar!", isCorrect: false }, { text: "En el Inicio, es el nacimiento del proyecto.", isCorrect: true }, { text: "En el Cierre, ¡ya casi terminamos!", isCorrect: false }, { text: "En la Planificación, hay que hacer el cronograma.", isCorrect: false } ], feedback_correct: "¡Correcto! La fase de INICIO es donde nace el proyecto. Aquí se define la idea, se obtiene la aprobación y se le da un nombre oficial. ¡Acabas de plantar la semilla!", feedback_incorrect: "¡Aún no! No podemos correr antes de caminar. La aprobación oficial es el banderazo de salida, la fase de INICIO. Después de esto, vendrá la planificación detallada." },
+            { stage: "Misión 5/10: Ciclo de Vida - Planificación", avatar: "📝", title: "Después del 'Sí'", text: "TransLog ha sido aprobado. El director te pregunta: '¿Qué sigue ahora?'. ¿Cuál es tu respuesta inmediata y profesional?", options: [ { text: "Desarrollar el Plan de Proyecto detallado.", isCorrect: true }, { text: "Contratar a los programadores inmediatamente.", isCorrect: false }, { text: "Empezar a codificar para ganar tiempo.", isCorrect: false }, { text: "Esperar las instrucciones del cliente día a día.", isCorrect: false } ], feedback_correct: "¡Impecable! Después del Inicio viene la PLANIFICACIÓN. Aquí se crea el mapa detallado: cronograma, recursos, riesgos... Es el cerebro de la operación.", feedback_incorrect: "¡Alto ahí! Contratar sin un plan detallado es como comprar los ingredientes sin tener la receta. Primero se planifica, luego se ejecuta." },
+            { stage: "Misión 6/10: Ciclo de Vida - Ejecución y Control", avatar: "🛠️", title: "Error Inesperado", text: "Durante la fase de Ejecución en TransLog, un programador descubre un error (bug) en el código. Al revisar y corregirlo, ¿qué otra fase se activa simultáneamente?", options: [ { text: "La fase de Cierre.", isCorrect: false }, { text: "La fase de Control.", isCorrect: true }, { text: "La fase de Inicio, hay que redefinir todo.", isCorrect: false }, { text: "La fase de Planificación, el plan falló.", isCorrect: false } ], feedback_correct: "¡Exacto! La Ejecución y el CONTROL van de la mano. Mientras el equipo trabaja (ejecuta), tú monitoreas (controlas) el progreso y corriges desviaciones, como los bugs.", feedback_incorrect: "No, el Cierre es la fase final. El CONTROL es la fase que se ejecuta en paralelo a la Ejecución para asegurar que todo vaya según el plan." },
+            { stage: "Misión 7/10: Ciclo de Vida - Cierre", avatar: "🏁", title: "¡Éxito en TransLog!", text: "El nuevo sistema de logística funciona a la perfección y el cliente firma su conformidad. ¿Cuál es el último paso para terminar formalmente?", options: [ { text: "Archivar los documentos y liberar al equipo.", isCorrect: true }, { text: "Tomar vacaciones inmediatamente.", isCorrect: false }, { text: "Empezar un nuevo proyecto enseguida.", isCorrect: false }, { text: "Hacer una fiesta y olvidarse del papeleo.", isCorrect: false } ], feedback_correct: "¡Así se hace! La fase de CIERRE es crucial. Se documentan las lecciones aprendidas, se entregan los informes finales y se disuelve oficialmente el equipo del proyecto.", feedback_incorrect: "¡Casi! Antes de las vacaciones, un buen líder se asegura de que el Cierre sea formal. Esto incluye la documentación y la liberación oficial de recursos." },
+            { stage: "Misión 8/10: Metodología Tradicional", avatar: "🏰", title: "Caso: TransLog", text: "El proyecto TransLog tiene un objetivo muy claro y requisitos bien definidos desde el principio. Es poco probable que cambien. ¿Qué metodología es la más segura y predecible?", options: [ { text: "Ágil, para ser flexibles.", isCorrect: false }, { text: "Tradicional (Cascada), para seguir un plan secuencial.", isCorrect: true }, { text: "Una metodología híbrida sin un plan claro.", isCorrect: false }, { text: "La metodología que elija el programador.", isCorrect: false } ], feedback_correct: "¡Correcto! La metodología TRADICIONAL o en Cascada es perfecta para proyectos predecibles. Su estructura secuencial (Inicio -> Planificación -> Ejecución...) asegura control y orden.", feedback_incorrect: "Aunque la flexibilidad es buena, para un proyecto con requisitos tan claros, una metodología Ágil podría ser innecesariamente compleja. Lo tradicional es más directo en este caso." },
+            { stage: "Misión 9/10: Metodología Ágil", avatar: "🌪️", title: "Caso: Fábrica IoT", text: "Para el proyecto de la Fábrica IoT, el cliente no tiene claros todos los requisitos. Es muy probable que pida cambios. ¿Qué tipo de metodología es más segura para esta situación?", options: [ { text: "Metodología Ágil (Scrum).", isCorrect: true }, { text: "Metodología en Cascada (Waterfall).", isCorrect: false }, { text: "Exigirle al cliente que se decida por todo ahora.", isCorrect: false }, { text: "Documentar cada posible cambio en un manual de 100 páginas.", isCorrect: false } ], feedback_correct: "¡Brillante estrategia! La metodología ÁGIL está diseñada para la incertidumbre. Permite hacer ajustes en ciclos cortos (sprints), mostrando avances y adaptándose a nuevas ideas.", feedback_incorrect: "¡Peligro! Un plan estricto (Cascada) con un cliente indeciso es una receta para el conflicto. Forzarlo a decidir todo al inicio generará frustración." },
+            { stage: "Misión 10/10: Triple Restricción", avatar: "⚖️", title: "¡Emergencia!", text: "El cliente de TransLog te pide terminar un mes antes (Tiempo). Como Jefe de Proyecto, ¿qué dos variables se verán afectadas inmediatamente?", options: [ { text: "El Costo y/o el Alcance.", isCorrect: true }, { text: "La calidad y la motivación del equipo.", isCorrect: false }, { text: "Nada, si el equipo es eficiente.", isCorrect: false }, { text: "Solo el estrés del Jefe de Proyecto.", isCorrect: false } ], feedback_correct: "¡Análisis de experto! Has identificado la Triple Restricción. Reducir el TIEMPO inevitablemente aumenta el COSTO (más gente, horas extra) o reduce el ALCANCE (entregar menos cosas).", feedback_incorrect: "La calidad y motivación son consecuencias, pero las variables directas de la Triple Restricción que debes negociar son el Costo y el Alcance." }
+        ]
+    },
+    lab2: {
+        title: "Directiva: Plan Maestro",
+        challenge: "El caos es el enemigo. Tu reto es forjar un plan de batalla perfecto, definiendo objetivos, límites, tareas y recursos para garantizar la victoria.",
+        icon: "🗺️",
+        totalQuestions: 10,
+        data: [
+            { stage: "Misión 1/10: Plan vs. Organización", avatar: "🧠", title: "¿Qué vs. Cómo?", text: "Definir que 'construiremos un coche eléctrico' es la Planificación. Asignar a 'Beto al motor y a Carla al chasis' es la...", options: [ { text: "Organización.", isCorrect: true }, { text: "También es Planificación.", isCorrect: false }, { text: "Ejecución.", isCorrect: false }, { text: "Control.", isCorrect: false } ], feedback_correct: "¡Correcto! La Planificación es el 'QUÉ' queremos hacer. La Organización es el 'CÓMO' lo vamos a hacer, distribuyendo tareas y recursos. ¡Dominas la diferencia!", feedback_incorrect: "No exactamente. Asignar tareas y recursos ya es parte de la Organización, es decir, el 'cómo' vamos a ejecutar el plan que ya se definió." },
+            { stage: "Misión 2/10: Objetivos S.M.A.R.T.", avatar: "🎯", title: "Objetivo Débil", text: "Tu equipo propone el objetivo: 'Mejorar la eficiencia de la fábrica'. ¿Por qué este objetivo es débil y corre riesgo de fracasar?", options: [ { text: "Porque no es Específico ni Medible.", isCorrect: true }, { text: "Porque es demasiado ambicioso.", isCorrect: false }, { text: "Porque no menciona el presupuesto.", isCorrect: false }, { text: "Porque el equipo no está de acuerdo.", isCorrect: false } ], feedback_correct: "¡Diagnóstico preciso! Un objetivo vago no se puede medir, y lo que no se mide, no se puede gestionar. 'Mejorar' no significa nada sin números concretos.", feedback_incorrect: "La ambición no es el problema, sino la falta de claridad. Un buen objetivo debe ser específico y medible para que sepas si has ganado o perdido." },
+            { stage: "Misión 3/10: Fortaleciendo Objetivos", avatar: "💪", title: "Mejorando la Misión", text: "Corriges el objetivo anterior a: 'Reducir el tiempo de inactividad de las máquinas un 15%'. ¿Qué elemento S.M.A.R.T. crucial le falta todavía?", options: [ { text: "La 'R' de Relevante.", isCorrect: false }, { text: "La 'T' de Tiempo.", isCorrect: true }, { text: "La 'A' de Alcanzable.", isCorrect: false }, { text: "La 'S' de Específico (Specific).", isCorrect: false } ], feedback_correct: "¡Perfecto! Sin un plazo, un objetivo es solo un sueño. Añadiendo '...en los próximos 6 meses', lo conviertes en un objetivo S.M.A.R.T. completo y profesional.", feedback_incorrect: "El objetivo es Relevante porque impacta el negocio. Lo que le falta es un límite de Tiempo para crear un sentido de urgencia y poder medir el éxito en un plazo concreto." },
+            { stage: "Misión 4/10: El Alcance", avatar: "🗺️", title: "¡Petición Inesperada!", text: "El cliente sugiere añadir cámaras de seguridad, algo no planificado. ¿Cómo proteges al proyecto del 'Scope Creep'?", options: [ { text: "Consultar el Alcance y explicarle qué está fuera de las fronteras.", isCorrect: true }, { text: "Aceptar para mantener feliz al cliente.", isCorrect: false }, { text: "Ignorar la petición y esperar que se le olvide.", isCorrect: false }, { text: "Decirle que sí, pero cobrarle el doble sin analizar el impacto.", isCorrect: false } ], feedback_correct: "¡Perfecto! El 'Alcance' es el muro protector de tu proyecto. Al usarlo como referencia, gestionas las expectativas y evitas que el proyecto se desborde.", feedback_incorrect: "¡Alerta roja de 'Scope Creep'! Aceptar trabajo extra sin analizarlo es la vía rápida al fracaso, agotando tus recursos y retrasando la entrega principal." },
+            { stage: "Misión 5/10: Proactividad", avatar: "💡", title: "Una Idea Brillante", text: "Un desarrollador tiene una idea para una nueva función genial que no está en el plan. ¿Cuál es la acción correcta como líder?", options: [ { text: "Implementarla en secreto.", isCorrect: false }, { text: "Agradecer la idea, documentarla para una 'Fase 2' y seguir con el plan actual.", isCorrect: true }, { text: "Rechazar la idea de inmediato para no distraer.", isCorrect: false }, { text: "Cambiar todo el plan para incluir la nueva función.", isCorrect: false } ], feedback_correct: "¡Gestión magistral! Reconoces la buena idea sin desviarte de la misión actual. Documentarla para el futuro mantiene al equipo motivado y al proyecto enfocado.", feedback_incorrect: "Implementar funciones fuera del alcance, incluso si son buenas, es una forma de autosabotaje. Rompe la planificación y consume recursos no asignados." },
+            { stage: "Misión 6/10: La EDT", avatar: "🌳", title: "La montaña de 'Instalar Sistema'.", text: "La tarea principal parece enorme y el equipo está paralizado. ¿Qué herramienta usas para dividir el trabajo en partes manejables?", options: [ { text: "La Estructura de Desglose del Trabajo (EDT).", isCorrect: true }, { text: "Una charla motivacional.", isCorrect: false }, { text: "Un diagrama de flujo de datos.", isCorrect: false }, { text: "El cronograma del proyecto.", isCorrect: false } ], feedback_correct: "¡Brillante! La EDT descompone el 'tronco' (proyecto) en 'ramas' (fases) y 'hojas' (tareas). Esto elimina la ansiedad y da pasos claros y concretos.", feedback_incorrect: "La motivación es buena, pero no es un plan. Sin una estructura clara, el equipo seguirá viendo una montaña. La EDT les proporciona un camino." },
+            { stage: "Misión 7/10: Jerarquía de la EDT", avatar: "📊", title: "Ordenando el Caos", text: "Tienes estas tareas: 1. Comprar Sensores, 2. Instalar Sistema IoT, 3. Instalar Sensores. ¿Cuál es el orden jerárquico correcto en una EDT (de mayor a menor)?", options: [ { text: "2 > 3 > 1", isCorrect: true }, { text: "1 > 3 > 2", isCorrect: false }, { text: "3 > 1 > 2", isCorrect: false }, { text: "Todos son del mismo nivel.", isCorrect: false } ], feedback_correct: "¡Estructura perfecta! Entiendes la lógica jerárquica: el gran objetivo (Instalar Sistema) se descompone en fases (Instalar Sensores), que a su vez contienen tareas específicas (Comprar Sensores).", feedback_incorrect: "No, el orden debe ir de lo más general a lo más específico. No puedes comprar sensores si no sabes qué sistema vas a instalar." },
+            { stage: "Misión 8/10: Recursos Humanos", avatar: "🧑‍🤝‍🧑", title: "Ensamblando al equipo ideal.", text: "Es momento de instalar los sensores, una tarea de alta precisión. ¿A quién del equipo le asignas esta misión crítica?", options: [ { text: "A Beto (Ingeniero Técnico), cuya especialidad es el hardware.", isCorrect: true }, { text: "A Carla (Capacitadora), para que practique.", isCorrect: false }, { text: "A Ana (Jefa de Proyecto), porque debe saber de todo.", isCorrect: false }, { text: "Al que se ofrezca voluntario primero.", isCorrect: false } ], feedback_correct: "¡Elección de experto! Asignar las tareas según las habilidades (Recursos Humanos) es clave para la excelencia y la eficiencia.", feedback_incorrect: "¡Decisión arriesgada! Colocar a la persona equivocada en una tarea crítica puede generar errores, retrasos y desmotivación." },
+            { stage: "Misión 9/10: Conflicto de Recursos", avatar: "💥", title: "Recurso Faltante", text: "El equipo necesita un servidor especial para analizar datos, pero no se incluyó en el presupuesto. ¿Qué dos restricciones del proyecto están ahora en conflicto directo?", options: [ { text: "El Alcance y el Costo.", isCorrect: true }, { text: "El Tiempo y los Riesgos.", isCorrect: false }, { text: "La Calidad y el Alcance.", isCorrect: false }, { text: "El Costo y el Tiempo.", isCorrect: false } ], feedback_correct: "¡Correcto! El ALCANCE (lo que hay que hacer) requiere algo que el COSTO (el presupuesto) no permite. Es un conflicto clásico que como líder debes resolver.", feedback_incorrect: "Aunque puede afectar el tiempo y generar riesgos, el conflicto inmediato y directo es entre lo que se necesita para cumplir el Alcance y el dinero disponible (Costo)." },
+            { stage: "Misión 10/10: El Cronograma", avatar: "🗓️", title: "¡El caos del tiempo!", text: "Unos prueban el software mientras otros aún no han instalado los sensores. ¿Qué implementas para crear un flujo de trabajo lógico?", options: [ { text: "Crear un Cronograma detallado con un Diagrama de Gantt.", isCorrect: true }, { text: "Pedirles que hagan horas extra.", isCorrect: false }, { text: "Hacer reuniones diarias hasta que se organicen solos.", isCorrect: false }, { text: "Dejar que cada uno decida sus propios plazos.", isCorrect: false } ], feedback_correct: "¡Maestría en gestión! El Cronograma pone todas las 'hojas' de tu EDT en una línea de tiempo secuencial, asegurando que nadie construya el techo antes que los cimientos.", feedback_incorrect: "¡Eso solo aumentará el estrés! Sin un Cronograma, el equipo seguirá trabajando de forma desordenada. Necesitan un plan de tiempo claro." }
+        ]
+    },
+    lab3: { 
+        title: "Protocolo: Ejecución", 
+        challenge: "La planificación ha terminado. Es hora de liderar al equipo en el campo de batalla, gestionar la comunicación y superar los obstáculos imprevistos.", 
+        icon: "⚙️", 
+        totalQuestions: 10,
+        data: [
+            { stage: "Misión 1/10: Técnicas de Ejecución", avatar: "🛠️", title: "Poniendo el Plan en Marcha", text: "Estás en el proyecto de inventarios. ¿Cuál es la actividad principal de la fase de EJECUCIÓN?", options: [ { text: "Realizar las actividades definidas en el plan.", isCorrect: true }, { text: "Crear el cronograma del proyecto.", isCorrect: false }, { text: "Evaluar si el proyecto fue exitoso.", isCorrect: false }, { text: "Definir los objetivos principales.", isCorrect: false } ], feedback_correct: "¡Correcto! La Ejecución es donde el plan cobra vida. Es la fase de 'hacer el trabajo', como instalar software y capacitar al personal.", feedback_incorrect: "No, esas son actividades de otras fases. La Ejecución se enfoca exclusivamente en realizar el trabajo planificado." },
+            { stage: "Misión 2/10: Técnicas de Monitoreo", avatar: "📈", title: "¿Vamos por buen camino?", text: "El proyecto de inventarios lleva un mes. ¿Qué técnica te permite comparar visualmente el trabajo planificado contra el trabajo real completado?", options: [ { text: "Un Diagrama de Gantt con seguimiento.", isCorrect: true }, { text: "Una reunión para preguntar cómo van.", isCorrect: false }, { text: "El acta de constitución del proyecto.", isCorrect: false }, { text: "La lista de riesgos del proyecto.", isCorrect: false } ], feedback_correct: "¡Exacto! El Diagrama de Gantt no solo muestra el plan, sino que permite marcar el progreso real, dándote una visión clara y rápida de cualquier desviación.", feedback_incorrect: "Aunque las reuniones son importantes, una herramienta visual como el Gantt te da datos objetivos para el monitoreo, no solo percepciones." },
+            { stage: "Misión 3/10: Gestión de Equipos", avatar: "🤝", title: "Conflicto de Ideas", text: "Dos desarrolladores tienen ideas opuestas sobre cómo programar un módulo. La tensión está creciendo. ¿Cuál es tu rol como líder?", options: [ { text: "Facilitar una reunión para que encuentren una solución conjunta.", isCorrect: true }, { text: "Elegir la idea que te guste más sin escucharlos.", isCorrect: false }, { text: "Ignorarlos hasta que se pongan de acuerdo solos.", isCorrect: false }, { text: "Amenazarlos con despedirlos si no se deciden.", isCorrect: false } ], feedback_correct: "¡Liderazgo en acción! Tu rol es ser un mediador, no un dictador. Fomentar el diálogo constructivo fortalece al equipo y a menudo conduce a la mejor solución.", feedback_incorrect: "Ignorar o imponer una solución sin diálogo crea resentimiento y puede llevar a una mala implementación técnica. La colaboración es clave." },
+            { stage: "Misión 4/10: Motivación", avatar: "🌟", title: "Equipo Desgastado", text: "El equipo ha trabajado duro y está mostrando signos de agotamiento. ¿Cuál es la mejor estrategia para mantener la motivación?", options: [ { text: "Reconocer públicamente sus logros y celebrar los hitos alcanzados.", isCorrect: true }, { text: "Decirles que las quejas no están permitidas.", isCorrect: false }, { text: "Ofrecerles más trabajo para que se mantengan ocupados.", isCorrect: false }, { text: "Compararlos con otro equipo que va más rápido.", isCorrect: false } ], feedback_correct: "¡Excelente! El reconocimiento es un motivador poderoso. Celebrar las pequeñas victorias recarga la energía del equipo y refuerza su compromiso con el proyecto.", feedback_incorrect: "Presionar o ignorar el agotamiento solo empeorará la situación. Un equipo motivado es un equipo que se siente valorado." },
+            { stage: "Misión 5/10: Comunicación Efectiva", avatar: "🗣️", title: "Correo Confuso", text: "Envías un correo con instrucciones técnicas y al día siguiente nadie ha hecho nada porque no lo entendieron. ¿Qué elemento de la comunicación falló?", options: [ { text: "La Claridad del mensaje.", isCorrect: true }, { text: "La Empatía.", isCorrect: false }, { text: "La Asertividad.", isCorrect: false }, { text: "La Escucha activa.", isCorrect: false } ], feedback_correct: "¡Diagnóstico correcto! Un mensaje, por más bien intencionado que sea, es inútil si no es claro. Evitar tecnicismos y usar un lenguaje simple es crucial.", feedback_incorrect: "Aunque otros elementos son importantes, el problema principal aquí fue la falta de Claridad. El mensaje no fue comprensible para la audiencia." },
+            { stage: "Misión 6/10: Canales de Comunicación", avatar: "💬", title: "Decisión Urgente", text: "Necesitas tomar una decisión compleja que requiere debate y la opinión de varios miembros del equipo. ¿Qué canal de comunicación es el más adecuado?", options: [ { text: "Una videoconferencia o reunión presencial.", isCorrect: true }, { text: "Un correo electrónico masivo.", isCorrect: false }, { text: "Un mensaje en el grupo de chat.", isCorrect: false }, { text: "Esperar a encontrarlos en el pasillo.", isCorrect: false } ], feedback_correct: "¡Elección estratégica! Para temas complejos que requieren discusión, la comunicación en tiempo real (sincrónica) como una reunión es insuperable. Permite aclarar dudas al instante.", feedback_incorrect: "El correo o el chat son buenos para informar, pero terribles para debatir temas complejos. Generan hilos interminables y malentendidos." },
+            { stage: "Misión 7/10: KPIs", avatar: "📈", title: "Midiendo la Velocidad", text: "Tu equipo de desarrollo (usando Scrum) completó 30 'story points' en un sprint de 2 semanas. ¿Qué KPI acabas de medir?", options: [ { text: "La Velocidad del equipo.", isCorrect: true }, { text: "El Retorno de la Inversión (ROI).", isCorrect: false }, { text: "La Satisfacción del Cliente (CSAT).", isCorrect: false }, { text: "El Tiempo de Ciclo.", isCorrect: false } ], feedback_correct: "¡Correcto! La 'Velocidad' es un KPI clave en Scrum que mide la cantidad de trabajo que un equipo puede completar en un sprint. Te ayuda a predecir entregas futuras.", feedback_incorrect: "No. El ROI y el CSAT miden el impacto en el negocio y el cliente, no el rendimiento interno del equipo de desarrollo. El Tiempo de Ciclo mide tareas individuales." },
+            { stage: "Misión 8/10: Aplicando KPIs", avatar: "📊", title: "Alerta de KPI", text: "El KPI 'Tiempo de Ciclo' (cuánto se tarda en completar una tarea) ha aumentado un 50% en las últimas semanas. ¿Qué te indica esto?", options: [ { text: "Hay un cuello de botella o un problema que está frenando al equipo.", isCorrect: true }, { text: "Que el equipo se está volviendo más perezoso.", isCorrect: false }, { text: "Que el presupuesto se está agotando.", isCorrect: false }, { text: "Que el proyecto va adelantado.", isCorrect: false } ], feedback_correct: "¡Excelente análisis! Un aumento en el Tiempo de Ciclo es una señal de alerta. Los KPIs no son para culpar, sino para detectar problemas. Tu deber es investigar y resolver ese cuello de botella.", feedback_incorrect: "Un KPI es un dato objetivo. Antes de asumir pereza, un buen líder investiga las posibles causas: ¿tareas más complejas? ¿problemas técnicos? ¿dependencias externas?" },
+            { stage: "Misión 9/10: Métricas de Éxito", avatar: "🏆", title: "KPI vs. Métrica de Éxito", text: "El proyecto se completó a tiempo y dentro del presupuesto (KPIs perfectos), pero la nueva plataforma de inventarios es tan complicada que nadie la usa. ¿El proyecto fue un éxito?", options: [ { text: "No, porque no cumplió la Métrica de Éxito de adopción.", isCorrect: true }, { text: "Sí, porque los KPIs de gestión fueron perfectos.", isCorrect: false }, { text: "Sí, porque el equipo trabajó bien.", isCorrect: false }, { text: "Depende de si el cliente pagó.", isCorrect: false } ], feedback_correct: "¡Visión de líder! Has entendido la diferencia crucial. Los KPIs miden la eficiencia del proceso, pero las Métricas de Éxito miden el impacto real. Un proyecto puede ser eficiente pero inútil. ¡El verdadero éxito es el valor aportado!", feedback_incorrect: "No. Cumplir con el cronograma y el presupuesto es importante, pero si el producto final no resuelve el problema o nadie lo usa, el proyecto no ha tenido éxito real." },
+            { stage: "Misión 10/10: Definiendo el Éxito", avatar: "🏅", title: "El Verdadero Objetivo", text: "Para el proyecto de inventarios, ¿cuál sería la MEJOR métrica de éxito para evaluar si se cumplió el objetivo principal?", options: [ { text: "Reducción del 15% en pérdidas de stock por desorganización.", isCorrect: true }, { text: "Número de líneas de código escritas.", isCorrect: false }, { text: "Cantidad de reuniones realizadas.", isCorrect: false }, { text: "El proyecto se completó en 4 meses.", isCorrect: false } ], feedback_correct: "¡Perfecto! Esa es una métrica de éxito ideal. Está alineada directamente con el objetivo de negocio ('mejorar la eficiencia'), es medible y demuestra el valor real que el proyecto aportó a la empresa.", feedback_incorrect: "Esas son métricas de proceso o de vanidad, no de éxito. El éxito no es cuánto trabajaste, sino qué lograste con ese trabajo." }
+        ]
+    },
+    lab4: { 
+        title: "Vigilancia: Monitoreo", 
+        challenge: "Un buen líder siempre tiene los ojos en el objetivo. Tu misión es medir el progreso con KPIs, controlar el rendimiento y ajustar el rumbo cuando sea necesario.", 
+        icon: "📊", 
+        totalQuestions: 10,
+        data: [
+            { stage: "Misión 1/10: Conceptos Financieros", avatar: "💲", title: "Lenguaje del Dinero", text: "Estás evaluando si los beneficios de la app de idiomas superarán la inversión. ¿Qué concepto financiero estás analizando?", options: [ { text: "El Retorno de la Inversión (ROI).", isCorrect: true }, { text: "El Flujo de Caja.", isCorrect: false }, { text: "La Reserva de Contingencia.", isCorrect: false }, { text: "El Diagrama de Gantt.", isCorrect: false } ], feedback_correct: "¡Correcto! El ROI es la métrica clave para medir la rentabilidad, comparando la ganancia obtenida con el costo de la inversión.", feedback_incorrect: "No. Aunque todos son importantes, el concepto que compara directamente beneficios con inversión es el Retorno de la Inversión (ROI)." },
+            { stage: "Misión 2/10: La Importancia del Presupuesto", avatar: "🏦", title: "El Guardián del Tesoro", text: "Para tu app de idiomas, con recursos limitados, ¿cuál es el beneficio MÁS importante de tener un presupuesto detallado?", options: [ { text: "Controlar los costos y evitar gastar más de lo que se tiene.", isCorrect: true }, { text: "Impresionar a los inversores con un documento profesional.", isCorrect: false }, { text: "Saber exactamente cuánto ganará cada empleado.", isCorrect: false }, { text: "Tener un plan de gastos que no se puede cambiar.", isCorrect: false } ], feedback_correct: "¡Exacto! Para una startup, cada centavo cuenta. El presupuesto es la herramienta de control esencial para asegurar la supervivencia y viabilidad del proyecto.", feedback_incorrect: "Aunque puede ayudar en otras áreas, la función principal y más crítica del presupuesto es el control de los costos para no exceder los límites financieros." },
+            { stage: "Misión 3/10: Costos Directos vs. Indirectos", avatar: "🏢", title: "Clasificando Gastos", text: "En el presupuesto de la app, el salario del programador es un costo directo. ¿Cuál de los siguientes sería un costo INDIRECTO?", options: [ { text: "El alquiler de la oficina donde trabaja todo el equipo.", isCorrect: true }, { text: "La licencia del software de programación para la app.", isCorrect: false }, { text: "El costo del servidor donde se alojará la app.", isCorrect: false }, { text: "El pago a un diseñador freelance para el logo de la app.", isCorrect: false } ], feedback_correct: "¡Perfecto! El alquiler es un costo indirecto porque la empresa lo pagaría incluso si este proyecto no existiera. No se puede atribuir al 100% a la app.", feedback_incorrect: "Los salarios del equipo, las licencias y los servidores para la app son costos directos, ya que existen específicamente por y para este proyecto." },
+            { stage: "Misión 4/10: Fuentes de Ingresos", avatar: "💸", title: "Monetizando la App", text: "Para la app de idiomas, se decide cobrar una tarifa mensual para acceder a todas las lecciones. ¿Qué tipo de fuente de ingresos es esta?", options: [ { text: "Licencias y suscripciones.", isCorrect: true }, { text: "Venta de productos.", isCorrect: false }, { text: "Patrocinios.", isCorrect: false }, { text: "Financiación externa.", isCorrect: false } ], feedback_correct: "¡Correcto! Las suscripciones generan ingresos recurrentes, un modelo de negocio muy popular y sostenible para aplicaciones de software.", feedback_incorrect: "No. La venta de productos sería si vendieras, por ejemplo, libros físicos. Esto es un pago por el uso continuo del servicio, es decir, una suscripción." },
+            { stage: "Misión 5/10: Estimación de Ingresos", avatar: "🔍", title: "Mirando al Futuro", text: "Antes de calcular cuántos ingresos puede generar la app, ¿cuál es el primer paso lógico que debe dar el equipo?", options: [ { text: "Realizar un análisis de mercado para entender la demanda.", isCorrect: true }, { text: "Definir el precio de la suscripción al azar.", isCorrect: false }, { text: "Empezar a programar y ver qué pasa.", isCorrect: false }, { text: "Preguntar a los amigos si pagarían por la app.", isCorrect: false } ], feedback_correct: "¡Mentalidad de estratega! No puedes estimar ingresos sin entender primero tu mercado: ¿cuántos clientes potenciales existen? ¿cuánto están dispuestos a pagar? El análisis de mercado es el cimiento.", feedback_incorrect: "Definir un precio sin conocer el mercado es un disparo en la oscuridad. El primer paso es siempre investigar la demanda y la competencia." },
+            { stage: "Misión 6/10: Control de Gastos", avatar: "📉", title: "Alerta de Desvío", text: "Revisas el presupuesto y notas que los gastos de marketing son 20% más altos de lo estimado. ¿Qué técnica aplicas para entender el problema?", options: [ { text: "Análisis de Variaciones.", isCorrect: true }, { text: "Análisis de Mercado.", isCorrect: false }, { text: "Proyecciones Financieras.", isCorrect: false }, { text: "Estimación de Ingresos.", isCorrect: false } ], feedback_correct: "¡Exacto! El Análisis de Variaciones consiste en comparar los resultados reales (el gasto actual) con lo planificado (el presupuesto) para identificar y entender las desviaciones.", feedback_incorrect: "No. Esas otras técnicas se usan para planificar. Cuando ya estás ejecutando y comparas lo real vs. lo planeado, estás haciendo un Análisis de Variaciones." },
+            { stage: "Misión 7/10: Reserva de Contingencia", avatar: "🛡️", title: "Falla Inesperada", text: "El servidor principal de la app se cae y necesitas contratar a un experto de emergencia, un costo no planificado. ¿De dónde debería salir idealmente ese dinero?", options: [ { text: "De la Reserva de Contingencia.", isCorrect: true }, { text: "Del salario del equipo.", isCorrect: false }, { text: "Pidiendo un préstamo urgente.", isCorrect: false }, { text: "Del presupuesto de marketing del próximo mes.", isCorrect: false } ], feedback_correct: "¡Planificación de élite! Para eso existe la Reserva de Contingencia. Es un fondo apartado específicamente para cubrir imprevistos y riesgos que se materializan.", feedback_incorrect: "Usar dinero de otras partidas pone en riesgo esas áreas. La forma profesional de manejar imprevistos es con una Reserva de Contingencia planificada." },
+            { stage: "Misión 8/10: Flujo de Caja", avatar: "🌊", title: "La Paradoja del Beneficio", text: "La app es rentable en papel (Ingresos > Gastos), pero la empresa no tiene dinero en el banco para pagar los salarios este mes. ¿Qué concepto financiero falló en gestionar?", options: [ { text: "El Flujo de Caja (Cash Flow).", isCorrect: true }, { text: "El Retorno de la Inversión (ROI).", isCorrect: false }, { text: "El Margen de Ganancia.", isCorrect: false }, { text: "Los Costos Fijos.", isCorrect: false } ], feedback_correct: "¡Diagnóstico clave! Ser rentable no es lo mismo que tener liquidez. El Flujo de Caja es la gestión de las entradas y salidas de dinero REAL. Un mal manejo puede quebrar un negocio rentable.", feedback_incorrect: "El problema no es de rentabilidad, sino de liquidez. El dinero de las ventas aún no ha llegado al banco para cubrir los gastos actuales. Eso es un problema de Flujo de Caja." },
+            { stage: "Misión 9/10: Proyecciones Financieras", avatar: "🔮", title: "Preparándose para Todo", text: "Tu equipo crea tres proyecciones de ingresos para la app: optimista, pesimista y realista. ¿Cuál es el principal objetivo de hacer esto?", options: [ { text: "Evaluar la viabilidad y los riesgos del proyecto en diferentes escenarios.", isCorrect: true }, { text: "Para confundir a los inversores con muchos números.", isCorrect: false }, { text: "Para elegir el escenario que más nos guste.", isCorrect: false }, { text: "Es un requisito burocrático sin utilidad práctica.", isCorrect: false } ], feedback_correct: "¡Visión estratégica! Analizar diferentes escenarios te prepara para lo mejor y lo peor. Te permite entender qué tan riesgoso es el proyecto y crear planes de contingencia.", feedback_incorrect: "No es un juego de adivinanzas. Es una herramienta estratégica para entender el rango de posibles resultados y prepararse para ellos, especialmente para el peor escenario." },
+            { stage: "Misión 10/10: Punto de Equilibrio", avatar: "⚖️", title: "La Meta de Viabilidad", text: "Alcanzar el 'Punto de Equilibrio' significa que la app ha llegado al punto donde...", options: [ { text: "Los ingresos totales igualan a los gastos totales.", isCorrect: true }, { text: "La app es la más descargada de la tienda.", isCorrect: false }, { text: "El proyecto se ha completado.", isCorrect: false }, { text: "Los inversores han recuperado su dinero.", isCorrect: false } ], feedback_correct: "¡Definición perfecta! El Punto de Equilibrio es el hito financiero donde el proyecto deja de perder dinero y cada nueva venta empieza a generar una ganancia neta.", feedback_incorrect: "No. El Punto de Equilibrio es un concepto puramente financiero que se alcanza cuando los ingresos cubren todos los costos, sin ganancias ni pérdidas." }
+        ]
+    },
+    lab5: { 
+        title: "Campaña: Finanzas", 
+        challenge: "Todo proyecto tiene un tesoro que proteger: el presupuesto. Aprende a gestionarlo, controlar los costos y asegurar la rentabilidad de tu misión.", 
+        icon: "💰", 
+        totalQuestions: 10,
+        data: [
+            { stage: "Misión 1/10: Gestión Financiera", avatar: "🧭", title: "El Rol del Dinero", text: "¿Cuál es el objetivo principal de la gestión financiera en el proyecto 'Moda Online'?", options: [ { text: "Asegurar que los recursos se usen eficientemente para cumplir los objetivos.", isCorrect: true }, { text: "Gastar todo el presupuesto para que no lo recorten el próximo año.", isCorrect: false }, { text: "Contratar al equipo más grande posible.", isCorrect: false }, { text: "Terminar el proyecto lo más rápido posible, sin importar el costo.", isCorrect: false } ], feedback_correct: "¡Correcto! La gestión financiera busca la máxima eficiencia: lograr los objetivos del proyecto utilizando los recursos de la mejor manera posible, dentro del tiempo y presupuesto.", feedback_incorrect: "No. El objetivo no es gastar por gastar ni la velocidad a cualquier precio. Es usar el dinero de forma inteligente para alcanzar las metas." },
+            { stage: "Misión 2/10: Evaluación de Recursos", avatar: "🧐", title: "Fondos Insuficientes", text: "El presupuesto de 'Moda Online' es de $40,000, pero tus cálculos iniciales suman $50,000. Al evaluar los recursos, ¿qué tipo de análisis estás haciendo?", options: [ { text: "Análisis de liquidez y viabilidad financiera.", isCorrect: true }, { text: "Análisis de la competencia.", isCorrect: false }, { text: "Análisis de satisfacción del cliente.", isCorrect: false }, { text: "Análisis de riesgos técnicos.", isCorrect: false } ], feedback_correct: "¡Exacto! Estás evaluando si los fondos disponibles (liquidez) son suficientes para cubrir los costos, determinando así la viabilidad financiera inicial.", feedback_incorrect: "No. El problema es interno, sobre la disponibilidad de fondos para cubrir los costos del proyecto. Es un análisis de liquidez." },
+            { stage: "Misión 3/10: Gestión de Costos", avatar: "🧮", title: "Clasificando Costos", text: "En el proyecto 'Moda Online', el costo mensual del servidor web ($500) se considera un...", options: [ { text: "Costo Fijo, porque no cambia mes a mes.", isCorrect: true }, { text: "Costo Variable, porque depende de las ventas.", isCorrect: false }, { text: "Costo de Contingencia.", isCorrect: false }, { text: "Costo de Oportunidad.", isCorrect: false } ], feedback_correct: "¡Correcto! Es un Costo Fijo porque, independientemente de cuánto se venda o se programe, el costo del servidor será el mismo cada mes durante el proyecto.", feedback_incorrect: "No es variable porque no fluctúa con la producción o ventas. Un costo variable sería, por ejemplo, una comisión por cada venta realizada en la plataforma." },
+            { stage: "Misión 4/10: Control de Gastos", avatar: "🛂", title: "Gasto Imprevisto", text: "El diseñador web pide una nueva tableta gráfica de $1,000 que no estaba en el presupuesto. ¿Qué estrategia de control de gastos aplicas?", options: [ { text: "Implementar un sistema de aprobación de gastos.", isCorrect: true }, { text: "Comprarla para mantenerlo motivado.", isCorrect: false }, { text: "Decirle que no hay dinero sin darle explicaciones.", isCorrect: false }, { text: "Usar el dinero de los salarios para comprarla.", isCorrect: false } ], feedback_correct: "¡Decisión de líder! Un sistema de aprobación asegura que cada gasto no planificado sea evaluado, justificado y aprobado antes de afectar el presupuesto. Es control, no autoritarismo.", feedback_incorrect: "Comprar por impulso o reasignar fondos sin análisis es una mala práctica que lleva a sobrecostos y problemas mayores. El control es fundamental." },
+            { stage: "Misión 5/10: Optimización de Recursos", avatar: "💡", title: "Alternativa Inteligente", text: "Para 'Moda Online', en lugar de contratar un fotógrafo caro, propones usar un software de IA para generar imágenes de producto. ¿Qué estrategia estás aplicando?", options: [ { text: "Maximizar el uso de los recursos financieros.", isCorrect: true }, { text: "Aumentar los riesgos del proyecto.", isCorrect: false }, { text: "Reducir el alcance del proyecto.", isCorrect: false }, { text: "Ignorar la calidad del producto final.", isCorrect: false } ], feedback_correct: "¡Excelente! Estás buscando una forma más eficiente y económica de lograr el mismo resultado (fotos de alta calidad), optimizando así el presupuesto.", feedback_incorrect: "Al contrario, es una estrategia para reducir costos y mitigar el riesgo de contratar a alguien que quizás no cumpla las expectativas, sin alterar el alcance." },
+            { stage: "Misión 6/10: Riesgos Financieros", avatar: "🌪️", title: "Nube de Incertidumbre", text: "El proveedor del servidor web anuncia un posible aumento de precios del 50% a mitad del proyecto. ¿Qué acabas de identificar?", options: [ { text: "Un riesgo financiero externo.", isCorrect: true }, { text: "Un cambio en el alcance.", isCorrect: false }, { text: "Un problema de comunicación en el equipo.", isCorrect: false }, { text: "Una oportunidad para negociar.", isCorrect: false } ], feedback_correct: "¡Correcto! Un aumento de precios de un proveedor es un riesgo financiero externo que puede impactar directamente tu presupuesto. Identificarlo es el primer paso para mitigarlo.", feedback_incorrect: "No es un cambio en lo que tienes que hacer (alcance), sino un evento externo que amenaza tus finanzas (riesgo)." },
+            { stage: "Misión 7/10: Mitigación de Riesgos", avatar: "🛡️", title: "Plan de Contingencia", text: "Ante el riesgo de aumento de precio del servidor, ¿cuál es una buena medida de mitigación?", options: [ { text: "Incluir una reserva de contingencia en el presupuesto.", isCorrect: true }, { text: "Esperar a que suceda y luego pedir más dinero.", isCorrect: false }, { text: "Cambiar de proveedor inmediatamente sin investigar.", isCorrect: false }, { text: "Cancelar el proyecto.", isCorrect: false } ], feedback_correct: "¡Estrategia proactiva! Tener una reserva de contingencia te permite absorber el impacto de riesgos financieros sin desestabilizar todo el proyecto.", feedback_incorrect: "Esperar a que ocurra el problema es reactivo y poco profesional. Un buen líder se anticipa al riesgo y prepara un plan." },
+            { stage: "Misión 8/10: Viabilidad Financiera", avatar: "🤔", title: "Análisis Final del Presupuesto", text: "El costo total calculado para 'Moda Online' es de $50,000, pero el presupuesto aprobado es de $40,000. ¿Cuál es la conclusión del análisis de viabilidad?", options: [ { text: "El proyecto no es viable con el presupuesto actual.", isCorrect: true }, { text: "El proyecto es perfectamente viable.", isCorrect: false }, { text: "El equipo debe trabajar gratis para cubrir la diferencia.", isCorrect: false }, { text: "Se debe empezar y ajustar sobre la marcha.", isCorrect: false } ], feedback_correct: "¡Análisis correcto y honesto! Si los costos superan el presupuesto, el proyecto no es viable en sus condiciones actuales. El siguiente paso es proponer soluciones.", feedback_incorrect: "Ignorar un déficit de $10,000 desde el inicio es una receta para el fracaso. La viabilidad debe estar clara antes de empezar." },
+            { stage: "Misión 9/10: Soluciones Estratégicas", avatar: "🧩", title: "Resolviendo el Déficit", text: "Dado el déficit de $10,000, ¿cuál de las siguientes es una acción estratégica viable que podrías proponer?", options: [ { text: "Reducir el alcance o negociar costos con proveedores.", isCorrect: true }, { text: "Pedir al equipo que trabaje el doble de rápido.", isCorrect: false }, { text: "Usar materiales de menor calidad para la plataforma.", isCorrect: false }, { text: "Ocultar el déficit y esperar un milagro.", isCorrect: false } ], feedback_correct: "¡Mentalidad de líder! Las soluciones reales implican tomar decisiones difíciles pero inteligentes, como ajustar lo que se va a entregar (alcance) o ser más eficiente con los gastos (negociar).", feedback_incorrect: "Las otras opciones comprometen la calidad, al equipo o simplemente son irresponsables. Un líder busca soluciones estratégicas." },
+            { stage: "Misión 10/10: La Gestión es un Todo", avatar: "🌐", title: "Visión Integral", text: "La gestión financiera de un proyecto es...", options: [ { text: "Un proceso continuo de planificación, control y toma de decisiones.", isCorrect: true }, { text: "Algo que solo le importa al departamento de contabilidad.", isCorrect: false }, { text: "Un documento que se hace al principio y no se vuelve a mirar.", isCorrect: false }, { text: "Una simple suma de los costos.", isCorrect: false } ], feedback_correct: "¡Lección aprendida! Has entendido que la gestión financiera es un pilar dinámico y central en todo el ciclo de vida del proyecto, no un simple trámite.", feedback_incorrect: "No, es mucho más que eso. Es un proceso vivo y constante que acompaña al proyecto desde su nacimiento hasta su cierre." }
+        ]
+    },
+    final: {
+        title: "Prueba de Fuego",
+        challenge: "Esta es la prueba final. Un proyecto formativo que integra todos los conocimientos. Supera este desafío para obtener tu certificación de élite.",
+        icon: "🏆",
+        totalQuestions: 10,
+        locked: true,
+        data: [
+            // Lab 1 Questions
+            { stage: "Misión 1/10: Fundamentos", avatar: "🚀", title: "Análisis de Tareas", text: "Te piden 'crear una campaña de marketing para un nuevo producto'. ¿Es un proyecto o una operación?", options: [ { text: "Proyecto, porque tiene un inicio, un fin y un resultado único.", isCorrect: true }, { text: "Operación, porque el marketing es algo continuo.", isCorrect: false }, { text: "Depende del presupuesto.", isCorrect: false }, { text: "Ninguna, es solo una tarea.", isCorrect: false } ], feedback_correct: "¡Correcto! Una campaña específica es un proyecto. El marketing general de la empresa es una operación.", feedback_incorrect: "Incorrecto. Una campaña específica para un producto tiene un inicio y un fin definidos, y un objetivo único." },
+            { stage: "Misión 2/10: Fundamentos", avatar: "🌱", title: "Fase Clave", text: "Estás creando el cronograma y asignando el presupuesto para el proyecto. ¿En qué fase del ciclo de vida estás?", options: [ { text: "Planificación.", isCorrect: true }, { text: "Inicio.", isCorrect: false }, { text: "Ejecución.", isCorrect: false }, { text: "Cierre.", isCorrect: false } ], feedback_correct: "¡Exacto! El cronograma y el presupuesto son los entregables clave de la fase de Planificación.", feedback_incorrect: "No. El cronograma y el presupuesto se definen en la fase de Planificación, justo después del Inicio y antes de la Ejecución." },
+            // Lab 2 Questions
+            { stage: "Misión 3/10: Planificación", avatar: "🎯", title: "Objetivo Defectuoso", text: "Un objetivo dice: 'Aumentar las ventas significativamente este año'. ¿Cuál es su principal defecto S.M.A.R.T.?", options: [ { text: "No es Medible ('significativamente').", isCorrect: true }, { text: "No es Relevante.", isCorrect: false }, { text: "No es Alcanzable.", isCorrect: false }, { text: "Tiene un Tiempo definido.", isCorrect: false } ], feedback_correct: "¡Preciso! 'Significativamente' es subjetivo. Un objetivo S.M.A.R.T. debe ser cuantificable, como 'aumentar un 20%'.", feedback_incorrect: "El principal problema es que 'significativamente' no se puede medir, lo que hace imposible saber si se cumplió." },
+            { stage: "Misión 4/10: Planificación", avatar: "🌳", title: "El Poder de la EDT", text: "El equipo está confundido sobre las tareas específicas para 'desarrollar una app'. ¿Para qué sirve principalmente la EDT en este caso?", options: [ { text: "Para desglosar el trabajo en paquetes manejables.", isCorrect: true }, { text: "Para decidir el color de la app.", isCorrect: false }, { text: "Para escribir el código directamente.", isCorrect: false }, { text: "Para contratar más personal.", isCorrect: false } ], feedback_correct: "¡Correcto! La EDT es la herramienta fundamental para clarificar el trabajo, dividiéndolo en componentes más pequeños y fáciles de asignar.", feedback_incorrect: "No, la EDT es una herramienta de organización y desglose del trabajo, no de diseño o ejecución directa." },
+            // Lab 3 (Execution) Questions
+            { stage: "Misión 5/10: Ejecución", avatar: "🗣️", title: "Comunicación Rota", text: "Durante la Ejecución, el equipo de diseño y el de desarrollo no se hablan y entregan trabajos incompatibles. ¿Qué falló?", options: [ { text: "La gestión de la comunicación.", isCorrect: true }, { text: "La planificación del presupuesto.", isCorrect: false }, { text: "La definición del alcance.", isCorrect: false }, { text: "La selección de la metodología.", isCorrect: false } ], feedback_correct: "¡Bingo! Una comunicación fluida es vital en la Ejecución. Como líder, tu deber es asegurar que todos los equipos estén sincronizados.", feedback_incorrect: "Aunque otros factores pueden influir, el problema directo es la falta de comunicación entre los equipos durante la fase de trabajo." },
+            { stage: "Misión 6/10: Ejecución", avatar: "🔥", title: "Problema Crítico", text: "En plena Ejecución, el proveedor principal de un componente clave se declara en bancarrota. ¿Qué habilidad es crucial ahora?", options: [ { text: "La resolución de problemas y gestión de riesgos.", isCorrect: true }, { text: "La habilidad de culpar al proveedor.", isCorrect: false }, { text: "La capacidad de seguir el plan original sin cambios.", isCorrect: false }, { text: "La paciencia para esperar a que el problema se resuelva solo.", isCorrect: false } ], feedback_correct: "¡Así es! La Ejecución está llena de imprevistos. Un buen líder anticipa riesgos y actúa rápidamente para resolver problemas cuando surgen.", feedback_incorrect: "Un líder proactivo no espera ni culpa a otros. Enfrenta el problema y busca soluciones alternativas para mantener el proyecto a flote." },
+             // Lab 4 (Monitoring) Questions
+            { stage: "Misión 7/10: Monitoreo", avatar: "📊", title: "Midiendo el Pulso", text: "¿Cuál es el propósito principal de usar Indicadores Clave de Rendimiento (KPIs) durante la fase de Monitoreo?", options: [ { text: "Medir objetivamente el progreso contra los objetivos.", isCorrect: true }, { text: "Para generar informes largos y complejos.", isCorrect: false }, { text: "Para controlar cada minuto de trabajo del equipo.", isCorrect: false }, { text: "Solo son necesarios al final del proyecto.", isCorrect: false } ], feedback_correct: "¡Correcto! Los KPIs son el tablero de control del proyecto. Te dicen con datos si vas por buen camino o si necesitas ajustar el rumbo.", feedback_incorrect: "Los KPIs no son para microgestionar, sino para tener una visión objetiva y de alto nivel del progreso del proyecto hacia sus metas." },
+            { stage: "Misión 8/10: Monitoreo", avatar: "⚠️", title: "Alerta de Desviación", text: "Al Monitorear el proyecto, ves que el gasto real es un 30% mayor al planificado para esta fecha. ¿Cuál es tu primera acción?", options: [ { text: "Analizar la causa de la desviación y tomar acciones correctivas.", isCorrect: true }, { text: "Pedir más dinero inmediatamente sin investigar.", isCorrect: false }, { text: "Ignorarlo y esperar que se solucione solo el próximo mes.", isCorrect: false }, { text: "Reducir la calidad del producto para compensar.", isCorrect: false } ], feedback_correct: "¡Acción de líder! El monitoreo sirve para detectar desviaciones. El siguiente paso es analizar la causa raíz y aplicar una medida correctiva para volver al camino.", feedback_incorrect: "Ignorar una desviación o actuar sin analizarla solo empeorará el problema. Un buen líder investiga antes de actuar." },
+            // Lab 5 (Finance) Questions
+            { stage: "Misión 9/10: Finanzas", avatar: "💰", title: "Control de Costos", text: "Un miembro del equipo quiere comprar el software más caro del mercado 'porque es el mejor'. ¿Qué principio debes aplicar?", options: [ { text: "Evaluar si el costo se alinea con el valor que aporta y el presupuesto.", isCorrect: true }, { text: "Comprarlo inmediatamente para tener al equipo contento.", isCorrect: false }, { text: "Rechazarlo y comprar siempre la opción más barata.", isCorrect: false }, { text: "Dejar que el equipo decida sin supervisión.", isCorrect: false } ], feedback_correct: "¡Mentalidad de estratega! La gestión financiera no se trata de gastar mucho o poco, sino de gastar de forma inteligente, asegurando que cada costo esté justificado por el valor que aporta al proyecto.", feedback_incorrect: "Ni lo más caro ni lo más barato es siempre lo mejor. Las decisiones de compra deben basarse en un análisis de costo-beneficio alineado con el presupuesto." },
+            { stage: "Misión 10/10: Finanzas", avatar: "📈", title: "Presupuesto", text: "Estás creando el presupuesto para un nuevo proyecto de software. ¿Cuál de estos NO es un costo directo que debas incluir?", options: [ { text: "El alquiler de las oficinas centrales de la empresa.", isCorrect: true }, { text: "Los salarios de los desarrolladores del proyecto.", isCorrect: false }, { text: "Las licencias del software de programación.", isCorrect: false }, { text: "El costo de los servidores para la app.", isCorrect: false } ], feedback_correct: "¡Ojo de águila! El alquiler de la oficina es un costo operativo o indirecto de la empresa, no un costo directo atribuible únicamente a tu proyecto. ¡Has demostrado entender la diferencia!", feedback_incorrect: "Incorrecto. Los salarios del equipo, las licencias y los servidores son costos directos, es decir, gastos que existen únicamente por y para tu proyecto." }
+        ]
+    }
+};
 
-        function closeModal() {
-            modal.classList.add('hidden');
-        }
+let missionProgress;
+let currentMissionKey;
+let currentQuestionIndex;
+let currentScore;
+let sessionHistory;
+let playerName = '';
 
-        let studentName = '';
+const nameScreen = document.getElementById('name-screen');
+const mainMenu = document.getElementById('main-menu');
+const gameScreen = document.getElementById('game-screen');
+const resultsScreen = document.getElementById('results-screen');
+const diplomaScreen = document.getElementById('diploma-screen');
+const feedbackModal = document.getElementById('feedback-modal');
 
-        function startAdventure() {
-            const nameInput = document.getElementById('studentNameInput');
-            const nameError = document.getElementById('name-error');
-            studentName = nameInput.value.trim();
-            if (studentName) {
-                nameError.textContent = '';
-                nameInput.classList.remove('border-red-500');
-                showSlide(2);
-            } else {
-                nameError.textContent = 'Por favor, ingresa tu nombre para continuar.';
-                nameInput.classList.add('border-red-500');
-                nameInput.focus();
-            }
-        }
+// --- UI Elements ---
+const playerNameInput = document.getElementById('player-name');
+const welcomeMessage = document.getElementById('welcome-message');
+const missionsGrid = document.getElementById('missions-grid');
+const stageNameEl = document.getElementById('stage-name');
+const scoreEl = document.getElementById('score');
+const progressBarEl = document.getElementById('progress-bar');
+const avatarEl = document.getElementById('avatar');
+const questionTitleEl = document.getElementById('question-title');
+const questionTextEl = document.getElementById('question-text');
+const optionsContainer = document.getElementById('options-container');
+const feedbackTitleEl = document.getElementById('feedback-title');
+const feedbackTextEl = document.getElementById('feedback-text');
+const resultsContainer = document.getElementById('results-container');
+const resultsTitle = document.getElementById('results-title');
+const diplomaNameEl = document.getElementById('diploma-name');
+const diplomaDateEl = document.getElementById('diploma-date');
 
-        // --- NEW DYNAMIC QUIZ LOGIC ---
+// --- Buttons ---
+const submitNameButton = document.getElementById('submit-name-button');
+const nextButton = document.getElementById('next-button');
+const resetAllButton = document.getElementById('reset-all-button');
+document.getElementById('back-to-menu-btn').addEventListener('click', showMainMenu);
+document.getElementById('results-back-to-menu-btn').addEventListener('click', showMainMenu);
+document.getElementById('diploma-back-to-menu-btn').addEventListener('click', showMainMenu);
 
-        const quizMasterData = {
-            quiz1: {
-                questions: [
-                    {
-                        question: "¿Por qué es útil especificar a la IA que genere retroalimentación para CADA opción?",
-                        options: [
-                            "Para que la evaluación sea más larga.",
-                            "Para convertir cada error en una oportunidad de aprendizaje inmediata.",
-                            "Porque es un requisito técnico de la IA.",
-                            "Para confundir a los estudiantes."
-                        ],
-                        correct: 1
-                    },
-                    {
-                        question: "Al crear un prompt para una evaluación diagnóstica, ¿cuál es el objetivo MENOS importante?",
-                        options: [
-                            "Identificar conocimientos previos.",
-                            "Calificar y asignar una nota final.",
-                            "Detectar conceptos erróneos.",
-                            "Medir el interés del estudiante en el tema."
-                        ],
-                        correct: 1
-                    }
-                ]
-            },
-            quiz2: {
-                questions: [
-                    {
-                        question: "¿Por qué es valioso pedirle a la IA que genere recomendaciones personalizadas en una autoevaluación?",
-                        options: [
-                            "Para que el estudiante solo lea las felicitaciones.",
-                            "Para que la autoevaluación no sea solo un checklist, sino el inicio de un plan de mejora concreto.",
-                            "Para hacer la evaluación más larga y difícil.",
-                            "Para que la IA tenga más trabajo."
-                        ],
-                        correct: 1
-                    },
-                    {
-                        question: "La evaluación formativa se enfoca principalmente en...",
-                        options: [
-                            "La calificación final del período.",
-                            "Comparar a los estudiantes entre sí.",
-                            "El proceso de aprendizaje y la retroalimentación para la mejora.",
-                            "Certificar las competencias adquiridas."
-                        ],
-                        correct: 2
-                    }
-                ]
-            },
-            quiz3: {
-                questions: [
-                     {
-                        question: "Incluir una sección de 'Análisis de Fuentes' en una evaluación sumativa ayuda a...",
-                        options: [
-                            "Evaluar habilidades superiores como el pensamiento crítico, en lugar de solo la memorización.",
-                            "Rellenar espacio para alcanzar el tiempo estimado de la prueba.",
-                            "Hacer la prueba más fácil de calificar.",
-                            "Asegurar que todos los estudiantes saquen la misma nota."
-                        ],
-                        correct: 0
-                    },
-                    {
-                        question: "¿Por qué es una buena práctica pedir a la IA que genere una rúbrica junto con la evaluación sumativa?",
-                        options: [
-                            "Para asegurar que los criterios de evaluación sean claros, objetivos y estén alineados con los objetivos de aprendizaje.",
-                            "Para que el documento de la evaluación sea más largo.",
-                            "Las rúbricas no son importantes en la evaluación.",
-                            "Para tener una excusa si los estudiantes reprueban."
-                        ],
-                        correct: 0
-                    }
-                ]
-            }
+
+function initializeApp() {
+    const savedName = localStorage.getItem('playerName');
+    if (savedName) {
+        playerName = savedName;
+        initializeProgress();
+        showMainMenu();
+    } else {
+        nameScreen.classList.remove('hidden');
+    }
+}
+
+function submitName() {
+    const name = playerNameInput.value.trim();
+    if (name) {
+        playerName = name;
+        localStorage.setItem('playerName', playerName);
+        initializeProgress();
+        showMainMenu();
+    } else {
+        alert("Por favor, introduce un nombre.");
+    }
+}
+
+function initializeProgress() {
+    const savedProgress = localStorage.getItem('missionProgress');
+    if (savedProgress) {
+        missionProgress = JSON.parse(savedProgress);
+    } else {
+        missionProgress = {
+            lab1: { completed: false, score: 0, history: [] },
+            lab2: { completed: false, score: 0, history: [] },
+            lab3: { completed: false, score: 0, history: [] },
+            lab4: { completed: false, score: 0, history: [] },
+            lab5: { completed: false, score: 0, history: [] },
+            final: { completed: false, score: 0, history: [] },
         };
+        saveProgress();
+    }
+}
 
-        // This object will hold the current state of the quizzes (shuffled questions, scores, etc.)
-        let activeQuizData = {};
+function saveProgress() {
+    localStorage.setItem('missionProgress', JSON.stringify(missionProgress));
+}
 
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+function showMainMenu() {
+    nameScreen.classList.add('hidden');
+    gameScreen.classList.add('hidden');
+    resultsScreen.classList.add('hidden');
+    diplomaScreen.classList.add('hidden');
+    mainMenu.classList.remove('hidden');
+    welcomeMessage.textContent = `Bienvenido/a, Jefe/a de Proyecto ${playerName}.`;
+    renderMissionsGrid();
+}
 
-        function initializeQuizzes() {
-            // Deep copy master data to active data to avoid modifying the original
-            activeQuizData = JSON.parse(JSON.stringify(quizMasterData)); 
-            
-            Object.keys(activeQuizData).forEach(quizId => {
-                const quiz = activeQuizData[quizId];
-                quiz.scores = Array(quiz.questions.length).fill(0);
-                quiz.totalAnswered = 0;
-                shuffle(quiz.questions);
-                renderQuiz(quizId);
-            });
-        }
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function renderMissionsGrid() {
+    missionsGrid.innerHTML = '';
+
+    const requiredMissions = ['lab1', 'lab2', 'lab3', 'lab4', 'lab5'];
+    const allRequiredComplete = requiredMissions.every(key => missionProgress[key] && missionProgress[key].completed);
+    
+    missions.final.locked = !allRequiredComplete;
+
+    Object.keys(missions).forEach(key => {
+        const mission = missions[key];
+        const progress = missionProgress[key];
+        const card = document.createElement('div');
+        card.className = `flex flex-col text-left p-6 glass-card rounded-2xl border-2 border-gray-700 transition-all duration-300 mission-card ${mission.locked ? 'locked opacity-60 cursor-not-allowed' : 'cursor-pointer'}`;
         
-        function renderQuiz(quizId) {
-            const container = document.getElementById(`${quizId}-container`);
-            container.innerHTML = ''; // Clear previous render
-            const quiz = activeQuizData[quizId];
+        const isCompleted = progress && progress.completed;
+        const scorePercentage = isCompleted ? (progress.score / mission.totalQuestions) * 100 : 0;
 
-            quiz.questions.forEach((q, questionIndex) => {
-                const questionCard = document.createElement('div');
-                questionCard.className = 'glass-card rounded-xl p-6 mb-4';
-                
-                const questionText = document.createElement('p');
-                questionText.className = 'text-lg font-semibold mb-4';
-                questionText.textContent = `Pregunta ${questionIndex + 1}/${quiz.questions.length}: ${q.question}`;
-                
-                const optionsGrid = document.createElement('div');
-                optionsGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
-
-                q.options.forEach((optionText, optionIndex) => {
-                    const optionButton = document.createElement('button');
-                    optionButton.className = 'quiz-option p-4 border-2 border-gray-600 rounded-lg text-left';
-                    optionButton.textContent = optionText;
-                    optionButton.onclick = () => checkAnswer(quizId, questionIndex, optionIndex);
-                    optionsGrid.appendChild(optionButton);
-                });
-                
-                const feedbackText = document.createElement('p');
-                feedbackText.className = 'feedback mt-3 text-sm h-5';
-                
-                questionCard.appendChild(questionText);
-                questionCard.appendChild(optionsGrid);
-                questionCard.appendChild(feedbackText);
-                container.appendChild(questionCard);
-            });
+        let actionButton;
+        if (key === 'final' && !mission.locked) {
+             actionButton = `
+                <button class="mt-auto w-full bg-yellow-500 text-black font-bold py-2 px-4 rounded-full start-mission-btn hover:bg-yellow-400">Iniciar Prueba Final</button>
+                <button class="mt-2 w-full bg-gray-600 text-white text-sm font-bold py-1 px-3 rounded-full demo-diploma-btn">Demo del Certificado</button>
+             `;
+             if(isCompleted){
+                actionButton += `<button class="mt-2 w-full bg-green-600 text-white font-bold py-2 px-4 rounded-full view-results-btn hover:bg-green-500">Ver Informe</button>`;
+             }
+        } else if (mission.locked) {
+            actionButton = `<button disabled class="mt-auto w-full bg-gray-600 text-gray-400 font-bold py-2 px-4 rounded-full">BLOQUEADO</button>`;
+        } else if (isCompleted) {
+            actionButton = `
+                <button class="mt-auto w-full bg-green-600 text-white font-bold py-2 px-4 rounded-full view-results-btn hover:bg-green-500">Ver Informe</button>
+                <button class="mt-2 w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-full retry-mission-btn hover:bg-blue-500">Reintentar Misión</button>
+            `;
+        } else {
+            actionButton = `<button class="mt-auto w-full bg-cyan-500 text-black font-bold py-2 px-4 rounded-full start-mission-btn hover:bg-cyan-400">Iniciar Misión</button>`;
         }
 
+        card.innerHTML = `
+            <div class="flex-grow">
+                <div class="flex items-center mb-3">
+                    <span class="text-4xl mr-4">${mission.icon || '❓'}</span>
+                    <h3 class="text-2xl font-bold font-condensed">${mission.title}</h3>
+                </div>
+                <p class="text-gray-400 text-sm mb-4 h-24">${mission.challenge}</p>
+                <div class="mb-4">
+                    <div class="flex justify-between items-center text-xs text-gray-300 mb-1">
+                        <span>PROGRESO</span>
+                        <span>${isCompleted ? `${progress.score}/${mission.totalQuestions}` : 'N/A'}</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2.5">
+                        <div class="bg-gradient-to-r from-cyan-400 to-blue-500 h-2.5 rounded-full" style="width: ${scorePercentage}%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-4 border-t border-gray-700/50">
+                ${actionButton}
+            </div>
+        `;
 
-        function checkAnswer(quizId, questionIndex, selectedOption) {
-            const quiz = activeQuizData[quizId];
-            if (quiz.scores[questionIndex] !== 0) return; // Already answered
-
-            const questionContainer = document.getElementById(`${quizId}-container`).children[questionIndex];
-            const options = questionContainer.querySelectorAll('.quiz-option');
-            const feedback = questionContainer.querySelector('.feedback');
-            const correctAnswer = quiz.questions[questionIndex].correct;
-
-            quiz.totalAnswered++;
-            quiz.scores[questionIndex] = (selectedOption === correctAnswer) ? 1 : -1;
-
-            options[selectedOption].classList.add(selectedOption === correctAnswer ? 'correct' : 'incorrect');
-            if (selectedOption !== correctAnswer) {
-                 options[correctAnswer].classList.add('correct');
-                 feedback.textContent = 'Casi. La respuesta correcta está marcada en verde.';
-                 feedback.style.color = '#dc3545';
-            } else {
-                 feedback.textContent = '¡Correcto! Excelente análisis.';
-                 feedback.style.color = '#28a745';
-            }
-
-            options.forEach(button => button.disabled = true);
-            
-            if (quiz.totalAnswered === quiz.questions.length) {
-                showQuizResult(quizId);
-            }
-        }
-
-        function showQuizResult(quizId) {
-            const quiz = activeQuizData[quizId];
-            const correctCount = quiz.scores.filter(score => score === 1).length;
-            const totalQuestions = quiz.questions.length;
-            const percentage = (correctCount / totalQuestions) * 100;
-            const resultElement = document.getElementById(`${quizId}-result`);
-            resultElement.textContent = `Resultado: ${correctCount} de ${totalQuestions} correctas (${percentage.toFixed(0)}%)`;
-
-            const nextLinkId = `next-link-${quizId.slice(-1)}`;
-            document.getElementById(nextLinkId).classList.remove('hidden');
-        }
-
-        function updateFinalReport() {
-            Object.keys(activeQuizData).forEach((quizId, index) => {
-                const quiz = activeQuizData[quizId];
-                const correctCount = quiz.scores.filter(score => score === 1).length;
-                const totalQuestions = quiz.questions.length;
-                const percentage = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
-                
-                const i = index + 1;
-                document.getElementById(`score-label-${i}`).textContent = `${percentage.toFixed(0)}%`;
-                document.getElementById(`score-bar-${i}`).style.width = `${percentage}%`;
-            });
-        }
-
-        function resetAndStart() {
-            // Reset UI elements
-            Object.keys(quizMasterData).forEach(quizId => {
-                const i = quizId.slice(-1);
-                document.getElementById(`${quizId}-result`).textContent = '';
-                document.getElementById(`next-link-${i}`).classList.add('hidden');
-            });
-
-            // Clear name and input field
-            studentName = '';
-            const nameInput = document.getElementById('studentNameInput');
-            nameInput.value = '';
-            nameInput.classList.remove('border-red-500');
-            document.getElementById('name-error').textContent = '';
-
-
-            // Re-initialize quizzes with shuffled questions and fresh scores
-            initializeQuizzes();
-            updateFinalReport(); // Reset progress bars to 0%
-            showSlide(1);
-        }
-
-        // Slide navigation logic
-        function showSlide(slideNumber) {
-            const slides = document.querySelectorAll('.slide');
-            slides.forEach((slide, index) => {
-                slide.classList.toggle('hidden', (index + 1) !== slideNumber);
-            });
-
-            if (slideNumber === 10) {
-                updateFinalReport();
-                const finalGreeting = document.getElementById('final-greeting');
-                const reportTitle = document.getElementById('report-title');
-
-                if (studentName) {
-                    // Sanitize name to prevent HTML injection
-                    const sanitizedName = studentName.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                    finalGreeting.innerHTML = `¡Felicidades, <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-blue-400">${sanitizedName}</span>!`;
-                    reportTitle.textContent = `Informe de Aprendizaje de ${sanitizedName}`;
-                } else {
-                    finalGreeting.textContent = '¡Felicidades, has completado tu entrenamiento!';
-                    reportTitle.textContent = 'Tu Informe Final de Aprendizaje';
+        if (!mission.locked) {
+            card.addEventListener('click', (e) => {
+                if (e.target.classList.contains('start-mission-btn') || e.target.classList.contains('retry-mission-btn')) {
+                    startGame(key);
+                } else if (e.target.classList.contains('view-results-btn')) {
+                    showResults(key);
+                } else if (e.target.classList.contains('demo-diploma-btn')) {
+                    showDiploma();
                 }
-            }
+            });
         }
+        missionsGrid.appendChild(card);
+    });
+}
 
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeQuizzes();
-            showSlide(1);
-        });
+function startGame(missionKey) {
+    currentMissionKey = missionKey;
+    currentQuestionIndex = 0;
+    currentScore = 0;
+    sessionHistory = [];
+    mainMenu.classList.add('hidden');
+    gameScreen.classList.remove('hidden');
+    displayQuestion();
+}
 
-    </script>
+function displayQuestion() {
+    if (!missions[currentMissionKey] || !missions[currentMissionKey].data || !missions[currentMissionKey].data[currentQuestionIndex]) {
+        console.error("Error: Mission data is missing for key:", currentMissionKey, "at index:", currentQuestionIndex);
+        alert("Error: No se pudo cargar la pregunta. Volviendo al menú principal.");
+        showMainMenu();
+        return;
+    }
+    const question = missions[currentMissionKey].data[currentQuestionIndex];
+    stageNameEl.textContent = question.stage;
+    updateProgress();
+    avatarEl.textContent = question.avatar;
+    questionTitleEl.textContent = question.title;
+    questionTextEl.textContent = question.text;
+    optionsContainer.innerHTML = '';
+    
+    const shuffledOptions = [...question.options];
+    shuffleArray(shuffledOptions);
 
+    shuffledOptions.forEach(option => {
+        const button = document.createElement('button');
+        button.textContent = option.text;
+        button.className = 'w-full text-left p-4 glass-card rounded-lg border-2 border-gray-700 transition-all duration-300 option-button';
+        button.onclick = () => selectAnswer(option);
+        optionsContainer.appendChild(button);
+    });
+}
+
+function selectAnswer(selectedOption) {
+    const isCorrect = selectedOption.isCorrect;
+    if (isCorrect) {
+        currentScore++;
+    }
+    sessionHistory.push({
+        question: missions[currentMissionKey].data[currentQuestionIndex],
+        selectedAnswer: selectedOption.text,
+        isCorrect: isCorrect
+    });
+    showFeedback(isCorrect);
+}
+
+function showFeedback(isCorrect) {
+    const question = missions[currentMissionKey].data[currentQuestionIndex];
+    feedbackModal.classList.remove('hidden', 'modal-leave');
+    feedbackModal.classList.add('modal-enter');
+    if (isCorrect) {
+        feedbackTitleEl.textContent = "✅ ¡Decisión Correcta!";
+        feedbackTitleEl.className = "text-3xl font-bold mb-4 text-green-400";
+        feedbackTextEl.textContent = question.feedback_correct;
+    } else {
+        feedbackTitleEl.textContent = "❌ ¡Cuidado, Jefe/a!";
+        feedbackTitleEl.className = "text-3xl font-bold mb-4 text-red-400";
+        feedbackTextEl.textContent = question.feedback_incorrect;
+    }
+}
+
+function nextQuestion() {
+    feedbackModal.classList.remove('modal-enter');
+    feedbackModal.classList.add('modal-leave');
+    setTimeout(() => {
+        feedbackModal.classList.add('hidden');
+        currentQuestionIndex++;
+        if (currentQuestionIndex < missions[currentMissionKey].data.length) {
+            displayQuestion();
+        } else {
+            endMission();
+        }
+    }, 300);
+}
+
+function updateProgress() {
+    const totalQuestions = missions[currentMissionKey].data.length;
+    const progressPercentage = (currentQuestionIndex / totalQuestions) * 100;
+    progressBarEl.style.width = `${progressPercentage}%`;
+    const scorePercentage = currentQuestionIndex > 0 ? (currentScore / currentQuestionIndex) * 100 : 0;
+    scoreEl.textContent = `EFECTIVIDAD: ${Math.round(scorePercentage)}%`;
+}
+
+function endMission() {
+    missionProgress[currentMissionKey].completed = true;
+    missionProgress[currentMissionKey].score = currentScore;
+    missionProgress[currentMissionKey].history = sessionHistory;
+    saveProgress();
+
+    if (currentMissionKey === 'final') {
+        showDiploma();
+    } else {
+        showResults(currentMissionKey);
+    }
+}
+
+function showResults(missionKey) {
+    mainMenu.classList.add('hidden');
+    gameScreen.classList.add('hidden');
+    diplomaScreen.classList.add('hidden');
+    resultsScreen.classList.remove('hidden');
+
+    const mission = missions[missionKey];
+    const progress = missionProgress[missionKey];
+    resultsTitle.textContent = `INFORME DE MISIÓN: ${mission.title}`;
+    
+    resultsContainer.innerHTML = `
+        <div class="glass-card rounded-2xl p-6 text-center mb-6">
+            <p class="font-condensed text-xl text-gray-300">PUNTUACIÓN FINAL</p>
+            <p class="text-6xl font-black ${progress.score / mission.totalQuestions >= 0.8 ? 'text-green-400' : 'text-yellow-400'}">
+                ${progress.score}/${mission.totalQuestions}
+            </p>
+        </div>
+    `;
+
+    progress.history.forEach((entry, index) => {
+        const question = entry.question;
+        const resultCard = document.createElement('div');
+        resultCard.className = 'glass-card rounded-2xl p-6';
+        
+        const answerClass = entry.isCorrect ? 'text-green-400' : 'text-red-400';
+        const answerIcon = entry.isCorrect ? '✅' : '❌';
+
+        resultCard.innerHTML = `
+            <p class="font-bold mb-2">${question.stage.split(':')[0]}: ${question.title}</p>
+            <p class="text-gray-400 text-sm mb-3">"${question.text}"</p>
+            <p class="mb-1">Tu respuesta (${playerName}): <span class="${answerClass} font-semibold">${answerIcon} ${entry.selectedAnswer}</span></p>
+            <div class="mt-2 pt-2 border-t border-gray-700/50">
+                <p class="text-xs text-cyan-300">${entry.isCorrect ? question.feedback_correct : question.feedback_incorrect}</p>
+            </div>
+        `;
+        resultsContainer.appendChild(resultCard);
+    });
+}
+
+function showDiploma() {
+    mainMenu.classList.add('hidden');
+    gameScreen.classList.add('hidden');
+    resultsScreen.classList.add('hidden');
+    diplomaScreen.classList.remove('hidden');
+
+    diplomaNameEl.textContent = playerName;
+    const today = new Date();
+    const dateString = today.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+    diplomaDateEl.textContent = dateString;
+}
+
+function resetAllProgress() {
+    if (confirm("¿Estás seguro de que quieres reiniciar todo tu progreso? Esta acción no se puede deshacer.")) {
+        localStorage.removeItem('missionProgress');
+        localStorage.removeItem('playerName');
+        playerName = '';
+        playerNameInput.value = '';
+        mainMenu.classList.add('hidden');
+        nameScreen.classList.remove('hidden');
+    }
+}
+
+// Event Listeners
+submitNameButton.addEventListener('click', submitName);
+playerNameInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') submitName();
+});
+nextButton.addEventListener('click', nextQuestion);
+resetAllButton.addEventListener('click', resetAllProgress);
+
+// Initial load
+initializeApp();
+
+</script>
 </body>
 </html>
 
